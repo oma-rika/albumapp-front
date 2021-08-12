@@ -3,16 +3,25 @@
         <header>
             <NuxtLink to="/signin" class="signin-button">サインイン</NuxtLink>
         </header>
-            <div class="grid">
-                <div class="column"><img src="~/assets/cat.jpg" class="image"></div>
-                <div class="column"><img src="~/assets/cat.jpg" class="image"></div>
-                <div class="column"><img src="~/assets/cat.jpg" class="image"></div>
-                <div class="column"><img src="~/assets/cat.jpg" class="image"></div>
-                <div class="column"><img src="~/assets/cat.jpg" class="image"></div>
-                <div class="column"><img src="~/assets/cat.jpg" class="image"></div>
+        <div class="container">
+            <div class="row">
+                <div class="col bg-primary">
+                    <div class="grid">
+                        <div class="column"><img src="~/assets/cat.jpg" class="image"></div>
+                        <div class="column"><img src="~/assets/cat.jpg" class="image"></div>
+                        <div class="column"><img src="~/assets/cat.jpg" class="image"></div>
+                        <div class="column"><img src="~/assets/cat.jpg" class="image"></div>
+                        <div class="column"><img src="~/assets/cat.jpg" class="image"></div>
+                        <div class="column"><img src="~/assets/cat.jpg" class="image"></div>
+                    </div>
+                </div>
+                <NextLogo />
             </div>
+        </div>
     </section>
 </template>
+<script>
+</script>
 <style>
     .grid {
         display: flex;

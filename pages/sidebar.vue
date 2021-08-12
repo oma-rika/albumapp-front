@@ -1,5 +1,7 @@
 <template>
-    <button type="button" class="btn btn-secondary">Button</button>
+    <div class="col bg-secondary">
+        testtesttesttest
+    </div>
 </template>
 <script lang="ts">
 
