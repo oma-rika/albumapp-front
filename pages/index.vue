@@ -47,5 +47,9 @@ export default Vue.extend({
   }
 })
 </script>
+<<<<<<< HEAD
 <style>
 </style>
+=======
+
+>>>>>>> 3c7acaa55edae3b9a414130d7bd64a9d1e649b33
