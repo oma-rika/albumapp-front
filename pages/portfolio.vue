@@ -1,11 +1,10 @@
 <template>
     <section>
-        <header>
-            <NuxtLink to="/signin" class="signin-button">サインイン</NuxtLink>
-        </header>
+        <Header />
         <div class="container">
             <div class="row">
-                <div class="col bg-primary">
+                <Sidebar />
+                <div class="col-lg-9 bg-primary">
                     <div class="grid">
                         <div class="column"><img src="~/assets/cat.jpg" class="image"></div>
                         <div class="column"><img src="~/assets/cat.jpg" class="image"></div>
@@ -37,11 +36,5 @@
     }
     .image {
         max-width: 100%;
-    }
-    header {
-        background-color: #24292e;
-        padding: 5px 20px;
-        height: 40px;
-        display: flex;
     }
 </style>
