@@ -23,20 +23,21 @@ app.get('/api',   (req, res) => {
     });
     let sql = 'select * from albumapp.user'
     connection.query(sql, function(error, rows, fields) {
-        if (error) res.status(500).send(error);
+        //if (error) res.status(500).send(error);
         let date = [];
         for (let i = 0; i < rows.length; i++) {
             console.log(rows[i]);
             date.push({
                 id: rows[i].id,
-                Account: rows[i].Account
+                Account: rows[i].Account,
+                NickName: rows[i].NickName
             })
         }
         ret = JSON.stringify(date);
-        res.header('Content-Type', 'application/json; charset=utf-8');
-        res.write(ret);
+        res.setHeader('Content-Type', 'application/json; charset=utf-8');
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.status(200).send(ret);
     })
-    //res.status(200).send(ret);
     connection.end();
 });
 
