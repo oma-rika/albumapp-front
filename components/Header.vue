@@ -3,7 +3,7 @@
         <NuxtLink to="/signin" class="signin-button">サインイン</NuxtLink>
     </header>
 </template>
-<style scoped>
+<style lang="scss" scoped>
     header {
         background-color: #24292e;
         padding: 5px 20px;

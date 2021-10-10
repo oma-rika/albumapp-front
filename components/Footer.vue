@@ -3,7 +3,7 @@
         <p class="copyright"><span>&copy;OmataR WebApp</span></p>
     </footer>
 </template>
-<style scoped>
+<style lang="scss" scoped>
     footer {
         background-color: #eeee;
         text-align: center;
