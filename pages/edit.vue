@@ -3,6 +3,30 @@
         <header />
         <div class="container">
             <h1 class="fs-5 fw-normal form-h1">Data Files Upload</h1>
+            <p>取り込むデータを選択</p>
+            <el-upload
+                class="upload-demo"
+                ref="upload"
+                drag
+                action="https://jsonplaceholder.typicode.com/posts/"
+                :auto-upload="false"
+                :on-preview="handlePreview"
+                :on-remove="handleRemove"
+                :file-list="fileList"
+            multiple>
+            <i class="el-icon-upload"></i>
+            <div class="el-upload__text">Drop file here or <em>click to upload</em></div>
+            <div class="el-upload__tip" slot="tip">jpg/png files with a size less than 500kb</div>
+            </el-upload>
+            
+            <div class="form-group">
+                <el-button type="success" @click="submitUpload">upload to server</el-button>
+                <el-button type="info" @click="chancelBtn" class="btn">キャンセルする</el-button>
+            </div>
+
+            <br /><br /><br />
+
+            <!--<el-button @click="visible = true">Button</el-button>-->
             <!--<div class="form-group">
                 <label for="selectFile" class="form-label">取り込むデータを選択</label>
                 <input type="file" v-on:change="handleFile" id="selectFile" class="form-control">
@@ -25,29 +49,6 @@
                 <button type="button" class="btn btn-primary">データを取り込む</button>
                 <button type="button" @click="chancelBtn" class="btn btn-secondary">キャンセルする</button>
             </div>
-
-
-            <div class="main">
-                <img src="~/assets/cat.jpg" class="image">
-                <div class="imageDownload-icon"></div>
-                <div class="folderUpload-icon"></div>
-            </div>
-            <div class="edit-action">
-                <h2 class="fs-5 fw-normal form-h2">バージョン履歴</h2>
-                <div class="session">
-                    <div class="datetime">2021/08/12(火)00:00:00</div>
-                    <div class="arrow"></div>
-                </div>
-                <div class="session">
-                    <div class="datetime">2021/08/12(火)00:00:00</div>
-                    <div class="arrow"></div>
-                </div>
-                <div class="session">
-                    <div class="datetime">2021/08/12(火)00:00:00</div>
-                    <div class="arrow"></div>
-                </div>
-            </div>
-            <button>Download</button>
         </div>
         <Footer />
     </section>
@@ -55,6 +56,8 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import ElementUI from 'element-ui'
+import locale from 'element-ui/lib/locale/lang/ja'
 
 export default Vue.extend({
     data() {
@@ -63,18 +66,25 @@ export default Vue.extend({
             binaryFile: '',
             testUrl: '',
             file: '',
+            fileList: [{
+            name: 'food.jpeg',
+            url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100'
+            }, {
+            name: 'food2.jpeg',
+            url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100'
+            }]
         }
     },
     methods: {
         //handleFile ({e}: {e:any}): void {
         readImage (): void {
-            const inputImage = (<HTMLInputElement>document.querySelector('#selectImage'))!.files[0];
-            console.log('inputImage.files:', inputImage);
-            if (inputImage.length == 0) return;
+            if ((<HTMLInputElement>document.getElementById('selectImage')).files[0].name === undefined) return;
+            const inputImage = (<HTMLInputElement>document.getElementById('selectImage'))!.files[0];
             const reader = new FileReader();
             reader.readAsDataURL(inputImage);
             reader.onload = (e) => {
-                this.binaryFile =  e.target.result;
+                if (!e.target) return;
+                this.binaryFile = e.target.result;
             }
             reader.onerror = (e) => {
                 alert('読み取り時にエラーが発生しました');
@@ -83,31 +93,19 @@ export default Vue.extend({
         chancelBtn (): void {
             this.binaryFile = '';
         },
-        showImageFile (): Object {
-            console.log('Hello');
-            console.log('this.binaryFile:', this.binaryFile);
-            /*this.binaryFile = 'get Image';
-            const reader = new FileReader();
-            const selectFile = document.querySelector('#selectFile');
-
-            if (selectFile != null) {
-                let fileInfo = selectFile.files;
-                console.log('fileInfo:', fileInfo);
-                reader.readAsDataURL(fileInfo[0]);
-            }
-
-            reader.onerror = function(event) {
-                alert('読み取り時にエラーが発生しました');
-            };
-
-            reader.onload = function(event) {
-                console.log('get Loading');
-                console.log(event);
-                let tmpTxt = event.target.result;
-                this.binaryFile = tmpTxt;
-            };
-            console.log('77777', this.binaryFile);*/
-            return this.binaryFile;
+        submitUpload() {
+            console.log('click:');
+            this.$refs.upload.submit();
+        },
+        handleRemove(file, fileList) {
+            console.log(file, fileList);
+        },
+        handlePreview(file) {
+            console.log(file);
+        },
+        handleChange({file}:{file:any}, {fileList}:{fileList:any}): void {
+            console.log('changeMethod');
+            this.fileList = fileList.slice(-3);
         }
     }
 })
