@@ -1,7 +1,11 @@
 
 // const { Router } = require("express");
-const express = require("express");
+const express = require('express');
 const app     = express();
+const cors    = require('cors');
+app.use(cors());
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
 
 
 
@@ -14,7 +18,7 @@ app.get('/api',   (req, res) => {
         host : 'localhost',
         user:  'root',
         database: 'albumapp',
-        password: '******',
+        password: '*****',
     })
     let ret=[];
     connection.connect((err) => {
@@ -43,4 +47,21 @@ app.get('/api',   (req, res) => {
 
 app.listen(3010, () => {
     console.log('api');
+});
+
+
+//app.set('views', __dirname + '/views');
+//app.set('view engine', 'ejs');
+
+//app.get('/test', (req, res) => {
+//    res.render('signup');
+//});
+
+app.post('/api', cors(), (req, res) => {
+    console.log('post受け取り');
+    //post値受け取れるか確認
+    console.log(req.body.UserName);
+    console.log(req.body.email);
+    console.log(req.body.password);
+    res.status(200).send('新規登録完了！');
 });
