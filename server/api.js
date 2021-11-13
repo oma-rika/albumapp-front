@@ -8,18 +8,18 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 
+const mysql = require('mysql');
+const connection = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    database: 'albumapp',
+    password: '*****',
+});
 
 app.get('/api',   (req, res) => {
     //res.status(200).send('app gets!!!');
     console.log('app.getに遷移');
     //res.set({ 'Access-Control-Allow-Origin': 'http://localhost:56976' });
-    const mysql = require('mysql')
-    const connection = mysql.createConnection({
-        host : 'localhost',
-        user:  'root',
-        database: 'albumapp',
-        password: '*****',
-    })
     let ret=[];
     connection.connect((err) => {
         if (err) throw err;
@@ -63,5 +63,17 @@ app.post('/api', cors(), (req, res) => {
     console.log(req.body.UserName);
     console.log(req.body.email);
     console.log(req.body.password);
-    res.status(200).send('新規登録完了！');
+    connection.connect((err) => {
+        if (err) throw err;
+        console.log('connected to mysql');
+    });
+    let sql = 'INSERT INTO albumapp.user (Account, MailAddress, Password) VALUES (?, ?, ?)';
+    connection.query(
+        sql,
+        [req.body.UserName, req.body.email, req.body.password],
+        (error, resuls) => {
+            res.status(200).send('新規登録完了！');
+        }
+    );
+    connection.end();
 });
