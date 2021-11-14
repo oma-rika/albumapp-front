@@ -1,22 +1,22 @@
 <template>
     <section>
         <Header />
-        <div class="container">
+        <div class="container signinPage">
             <h1 class="fs-5 text-center fw-normal form-h1">ログイン</h1>
-            <form action="/" method="post" class="signin-form">
+            <form action="http://localhost:3010/login" method="post" class="signin-form">
                 <div class="form-group">
-                    <label for="name" class="form-label">名前</label>
-                    <input type="text" id="name" class="form-control" placeholder="Please enter your name">
+                    <label for="e-mailaddress" class="form-label">メールアドレス</label>
+                    <input type="text" id="e-mailaddress" class="form-control" placeholder="Please enter your e-mail address" v-model="emailAddress">
                 </div>
                 <div class="form-group">
                     <label for="possword" class="form-label">パスワード</label>
-                    <input type="password" id="possword" class="form-control" aria-describedby="passwordHelpBlock">
+                    <input type="password" id="possword" name="password" class="form-control" aria-describedby="passwordHelpBlock" v-model="passWord">
                     <div id="passwordHelpBlock" class="form-text text-right">
                         <NuxtLink to="/possword_reset" class="fs-6">パスワードを忘れた場合はこちら</NuxtLink>
                     </div>
                 </div>
                 <div class="form-group">
-                    <button type="button" class="btn btn-primary btn-block">Sign&nbsp;in</button>
+                    <button type="button" @click="signIn" class="btn btn-primary btn-block">Sign&nbsp;in</button>
                 </div>
                 <div class="form-group">
                     <NuxtLink to="/signup" class="signin-button">Create an account.</NuxtLink>
@@ -26,6 +26,51 @@
         <Footer />
     </section>
 </template>
+
+<script lang="ts">
+import Vue from 'vue'
+import axios from 'axios'
+
+
+
+export default Vue.extend({
+    data() {
+        return {
+            emailAddress: '',
+            passWord: '',
+        }
+    },
+    methods: {
+        signIn(): void {
+            axios.post('http://localhost:3010/login', {
+                emailAddress: this.emailAddress,
+                passWord: this.passWord,
+            })
+            .then(function (response) {
+                switch(response.data) {
+                    case 'ok':
+                        console.log('ok');
+                        //成功したらリダイレクト
+                        window.location.href = '/';
+                        break;
+                    case 'notAccount':
+                        console.log('notAccount');
+                        //20211114追加
+                        //後程修正する
+                        let msg = document.createElement('p');
+                        msg.textContent =  '該当するアカウントはありません。もう一度お試し下さい';
+                        const element = document.querySelector<HTMLElement>('.signinPage')
+                        if (element) {
+                            element.appendChild(msg);
+                        }
+                        break;
+                }
+            })
+        }
+    }
+})
+
+</script>
 
 <style>
     .form-h1 {
