@@ -4,7 +4,7 @@
         <div class="container">
             <h1 class="fs-5 fw-normal form-h1">Data Files Upload</h1>
             <p>取り込むデータを選択</p>
-            <el-upload
+            <!--<el-upload
                 class="upload-demo"
                 ref="upload"
                 drag
@@ -18,11 +18,10 @@
             <div class="el-upload__text">Drop file here or <em>click to upload</em></div>
             <div class="el-upload__tip" slot="tip">jpg/png files with a size less than 500kb</div>
             </el-upload>
-            
             <div class="form-group">
                 <el-button type="success" @click="submitUpload">upload to server</el-button>
                 <el-button type="info" @click="chancelBtn" class="btn">キャンセルする</el-button>
-            </div>
+            </div>-->
 
             <br /><br /><br />
 
@@ -38,15 +37,16 @@
                 <label for="selectFile" class="form-label">取り込むデータを選択</label>
                 <input type="file" accept="image/*" @change="readImage" id="selectImage" class="form-control" />
             </div>
-            <div class="image-preview">
+            [{{binaryFile}}]
+            <!--<div class="image-preview">
                 <img src="/images/dummy.jpg" v-if="!binaryFile" alt="プレビュー画像" />
                 <img :src="binaryFile" v-if="binaryFile" alt="プレビュー画像" />
-            </div>
+            </div>-->
             <div class="showImageFile">
                 <img id="disp" :src="binaryFile" v-if="binaryFile.length > 0" />
             </div>
             <div class="form-group">
-                <button type="button" class="btn btn-primary">データを取り込む</button>
+                <button type="button" @click="updateBinaryData" class="btn btn-primary">データを取り込む</button>
                 <button type="button" @click="chancelBtn" class="btn btn-secondary">キャンセルする</button>
             </div>
         </div>
@@ -58,55 +58,67 @@
 import Vue from 'vue'
 import ElementUI from 'element-ui'
 import locale from 'element-ui/lib/locale/lang/ja'
+import axios from 'axios'
+
+
+
 
 export default Vue.extend({
     data() {
         return {
-            posts: [],
             binaryFile: '',
-            testUrl: '',
-            file: '',
-            fileList: [{
-            name: 'food.jpeg',
-            url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100'
-            }, {
-            name: 'food2.jpeg',
-            url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100'
-            }]
         }
     },
     methods: {
-        //handleFile ({e}: {e:any}): void {
-        readImage (): void {
-            if ((<HTMLInputElement>document.getElementById('selectImage')).files[0].name === undefined) return;
-            const inputImage = (<HTMLInputElement>document.getElementById('selectImage'))!.files[0];
-            const reader = new FileReader();
-            reader.readAsDataURL(inputImage);
-            reader.onload = (e) => {
-                if (!e.target) return;
-                this.binaryFile = e.target.result;
+        // データベースにPOSTする
+        updateBinaryData (): void {
+            if (this.binaryFile.length > 0) {
+                axios.post('http://localhost:3010/fileUpload', {
+                    emailAddress: this.emailAddress,
+                }).then(function (response) {
+                })
             }
-            reader.onerror = (e) => {
-                alert('読み取り時にエラーが発生しました');
+        },
+        readImage (event: any): void {
+            if (event.target.files && event.target.files[0]) {
+                //const inputImage = (<HTMLInputElement>document.getElementById('selectImage'))!.files[0];
+                const inputImage = event.target.files[0];
+                const reader = new FileReader();
+                reader.readAsDataURL(inputImage);
+                reader.onload = (e) => {
+                    if (e.target) {
+                        console.log('test:', new ArrayBuffer(10));
+                        //https://stackoverflow.com/questions/52955710
+                        const csv: string = e.target.result as string;
+                        if (typeof csv === 'string') {
+                            this.binaryFile = csv;
+                        } else {
+                            this.binaryFile = Buffer.from(csv).toString();
+                        }
+                    }
+                }
+                reader.onerror = (e) => {
+                    alert('読み取り時にエラーが発生しました');
+                }
             }
         },
         chancelBtn (): void {
-            this.binaryFile = '';
-        },
-        submitUpload() {
-            console.log('click:');
-            this.$refs.upload.submit();
-        },
-        handleRemove(file, fileList) {
-            console.log(file, fileList);
-        },
-        handlePreview(file) {
-            console.log(file);
-        },
-        handleChange({file}:{file:any}, {fileList}:{fileList:any}): void {
-            console.log('changeMethod');
-            this.fileList = fileList.slice(-3);
+             this.binaryFile = '';
         }
+        // submitUpload() {
+        //     console.log('click:');
+        //     this.$refs.upload.submit();
+        // },
+        // handleRemove({file}:{file:any}, {fileList}:{fileList:any}) {
+        //     console.log(file, fileList);
+        // },
+        // handlePreview(file) {
+        //     console.log(file);
+        // },
+        // handleChange({file}:{file:any}, {fileList}:{fileList:any}): void {
+        //     console.log('changeMethod');
+        //     this.fileList = fileList.slice(-3);
+        // }
     }
 })
 </script>
