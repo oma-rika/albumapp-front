@@ -46,7 +46,7 @@ const connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     database: 'albumapp',
-    password: 'oRe0948mj8tPw#rtmy_*!',
+    password: '*****',　//2021-11-18 PassWordChange
 });
 
 connection.connect((err) => {
