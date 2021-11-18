@@ -57,8 +57,9 @@
 <script lang="ts">
 import Vue from 'vue'
 import ElementUI from 'element-ui'
-import locale from 'element-ui/lib/locale/lang/ja'
+//import locale from 'element-ui/lib/locale/lang/ja'
 import axios from 'axios'
+import { v4 as uuid } from 'uuid';
 
 
 
@@ -72,10 +73,18 @@ export default Vue.extend({
     methods: {
         // データベースにPOSTする
         updateBinaryData (): void {
+            console.log('click');
+            //Generate a v4 (random) id
+            const guid: string = uuid();
+            console.log('guild:', guid);
             if (this.binaryFile.length > 0) {
                 axios.post('http://localhost:3010/fileUpload', {
-                    emailAddress: this.emailAddress,
+                    //テストで暫定で1を選択
+                    userId: 1,
+                    imageId: guid,
+                    imagePath: this.binaryFile,
                 }).then(function (response) {
+                    console.log('response', response);
                 })
             }
         },
