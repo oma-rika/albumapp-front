@@ -98,27 +98,26 @@ app.listen(3010, () => {
 app.post('/login', cors(), (req, res) => {
     console.log('signinアクション');
     //post値受け取れるか確認
-    //console.log(req.body.UserName);
     console.log(req.body.emailAddress);
     console.log(req.body.passWord);
-    connection.connect((err) => {
-        if (err) throw err;
-        console.log('connected to mysql');
-    });
+    // connection.connect((err) => {
+    //     if (err) throw err;
+    //     console.log('connected to mysql');
+    // });
     let resMessage;
     let sql = 'SELECT * FROM albumapp.user WHERE MailAddress = ? AND Password = ?';
     connection.query(
         sql,
         [req.body.emailAddress, req.body.passWord],
-        (error, resuls) => {
-            if (resuls.length > 0) {
+        (error, results) => {
+            if (results.length > 0) {
                 console.log('該当するユーザーがおりました');
                 resMessage = 'ok';
             } else {
                 console.log('該当するユーザーはいない');
                 resMessage = 'notAccount';
             }
-            res.status(200).send(resMessage);
+            res.status(200).json({status: resMessage, items: results});
         }
     );
     connection.end();
@@ -156,7 +155,7 @@ app.post('/fileUpload', cors(), (req, res) => {
     connection.query(
         sql,
         [req.body.userId, req.body.imageId, req.body.imagePath],
-        (error, resuls) => {
+        (error, results) => {
             res.status(200).send('登録完了！');
         }
     );
