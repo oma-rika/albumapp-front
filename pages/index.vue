@@ -1,10 +1,10 @@
 <template>
   <section>
     <Header />
-    aaaa
-    <div class="container" v-if="userAccount">
-      [{{userAccount}}]
+    <div class="container">
+      <p>[{{$store.state.message}}]</p>
     </div>
+    <button @click="$store.dispatch('updateMessageAction', 'Dispatch Message')">トップページに戻る</button>
   </section>
 </template>
 
@@ -16,7 +16,7 @@ import http from 'http'
 
 
 //let url = 'https://jsonplaceholder.typicode.com/users/1/albums'
-let url = 'http://localhost:3010/api';
+//let url = 'http://localhost:3010/api';
 export default Vue.extend({
   data() {
     return {
@@ -28,8 +28,8 @@ export default Vue.extend({
   },
   */
   async asyncData() {
-      const posts = await axios.get(url);
-      return { userAccount: posts.data }
+      //const posts = await axios.get(url);
+      //return { userAccount: posts.data }
   },
   methods: {
 

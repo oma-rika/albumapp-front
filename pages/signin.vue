@@ -2,6 +2,7 @@
     <section>
         <Header />
         <div class="container signinPage">
+                      <p>[{{$store.state.message}}]</p>
             <h1 class="fs-5 text-center fw-normal form-h1">ログイン</h1>
             <form action="http://localhost:3010/login" method="post" class="signin-form">
                 <div class="form-group">
@@ -22,6 +23,9 @@
                     <NuxtLink to="/signup" class="signin-button">Create an account.</NuxtLink>
                 </div>
             </form>
+
+            <!--<button @click="$store.dispatch('updateMessageAction', 'Dispatch Message')">ログインできました。</button>-->
+
         </div>
         <Footer />
     </section>
@@ -33,11 +37,13 @@ import axios from 'axios'
 
 
 
+
 export default Vue.extend({
     data() {
         return {
             emailAddress: '',
             passWord: '',
+            auth: [],
         }
     },
     methods: {
@@ -47,11 +53,14 @@ export default Vue.extend({
                 passWord: this.passWord,
             })
             .then(function (response) {
-                switch(response.data) {
+                switch(response.data.status) {
                     case 'ok':
                         console.log('ok');
+                        this.$store.dispatch("updateMessageAction", response.data.items[0]);
+                        //console.log('response.data.items:' {response.data.items[0])};
+                        //this.auth = response.data.items[0];
                         //成功したらリダイレクト
-                        window.location.href = '/';
+                        //window.location.href = '/';
                         break;
                     case 'notAccount':
                         console.log('notAccount');

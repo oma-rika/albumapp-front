@@ -4,7 +4,9 @@ const createStore = () => {
     return new Vuex.Store({
         state: function() {
             return {
-                message: 'Hello Vuex!'
+                message: 'Hello Vuex!',
+                userId: '',
+                token: '',
             }
         },
         // mutations: {
@@ -14,7 +16,10 @@ const createStore = () => {
         // },
         mutations: {
             updateMessage: function(state, payload) {
-                state.message = payload
+                //state.message = payload
+                state.userId = payload.userId;
+                //state.token = payload.token;
+
             }
         },
         // actions: {
@@ -24,11 +29,15 @@ const createStore = () => {
         // }
         actions: {
             updateMessageAction(context, payload) {
-                context.commit('updateMessage', payload)
+                console.log('updateMessageActionに遷移!!')
+                console.log('payload:', payload);
+                context.commit('updateMessage', payload);
             }
         }
     })
 }
+
+
 
 
 export default createStore
