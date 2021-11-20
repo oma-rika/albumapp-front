@@ -83,7 +83,8 @@ export default Vue.extend({
                     userId: 1,
                     imageId: guid,
                     imagePath: this.binaryFile,
-                }).then(function (response) {
+                }).then((response) => {
+
                     console.log('response', response);
                 })
             }

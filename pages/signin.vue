@@ -52,7 +52,7 @@ export default Vue.extend({
                 emailAddress: this.emailAddress,
                 passWord: this.passWord,
             })
-            .then(function (response) {
+            .then((response) => {
                 switch(response.data.status) {
                     case 'ok':
                         console.log('ok');
