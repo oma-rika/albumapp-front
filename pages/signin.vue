@@ -43,7 +43,9 @@ export default Vue.extend({
         return {
             emailAddress: '',
             passWord: '',
-            auth: [],
+            auth: [
+                {token: 'dummy token'},
+            ],
         }
     },
     methods: {
@@ -56,11 +58,13 @@ export default Vue.extend({
                 switch(response.data.status) {
                     case 'ok':
                         console.log('ok');
-                        this.$store.dispatch("updateMessageAction", response.data.items[0]);
+                        this.auth.push(response.data.items[0]);
+                        //console.log('this.auth:', this.auth);
                         //console.log('response.data.items:' {response.data.items[0])};
+                        this.$store.dispatch("updateMessageAction", this.auth);
                         //this.auth = response.data.items[0];
                         //成功したらリダイレクト
-                        //window.location.href = '/';
+                        window.location.href = '/';
                         break;
                     case 'notAccount':
                         console.log('notAccount');

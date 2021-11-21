@@ -23,6 +23,11 @@ export default Vue.extend({
       posts: []
     }
   },
+  //layout: 'Top',
+  layout({store}) {
+    console.log('store.state.loggedIn:', store.state.loggedIn);
+    return store.state.loggedIn ? 'Top' : 'Welcome';
+  },
   /*async fetch() {
       this.posts = await axios.get(url);
   },

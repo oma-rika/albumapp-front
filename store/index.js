@@ -1,12 +1,14 @@
 import Vuex from 'vuex'
+import createPersistedState from "vuex-persistedstate";
 
 const createStore = () => {
     return new Vuex.Store({
         state: function() {
             return {
                 message: 'Hello Vuex!',
-                userId: '',
+                userId: 0,
                 token: '',
+                loggedIn: false,
             }
         },
         // mutations: {
@@ -16,10 +18,21 @@ const createStore = () => {
         // },
         mutations: {
             updateMessage: function(state, payload) {
-                //state.message = payload
-                state.userId = payload.userId;
-                //state.token = payload.token;
+                console.log('updateMessageに遷移!!')
+                state.token = payload[0].token;
+                state.userId = payload[1].id;
+                console.log('state.token:', state.token);
+                console.log('state.userId:', state.userId);
+                if (state.token != null || state.token != '') {
+                    state.loggedIn = true;
+                    console.log('state.loggedIn:', state.loggedIn);
+                }
 
+            },
+            logout(state) {
+               state.token = '';
+               state.loggedIn = false;
+               state.userId = 0;
             }
         },
         // actions: {
@@ -30,10 +43,11 @@ const createStore = () => {
         actions: {
             updateMessageAction(context, payload) {
                 console.log('updateMessageActionに遷移!!')
-                console.log('payload:', payload);
+                //console.log('payload:', payload);
                 context.commit('updateMessage', payload);
             }
-        }
+        },
+        plugins: [createPersistedState({storage: window.sessionStorage})]
     })
 }
 
