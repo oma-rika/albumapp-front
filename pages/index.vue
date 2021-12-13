@@ -1,6 +1,9 @@
 <template>
   <section>
     <Header />
+    <v-container>
+      <v-btn color="primary">テスト</v-btn>
+    </v-container>
     <div class="container">
       <p>[{{$store.state.message}}]</p>
     </div>
@@ -26,7 +29,8 @@ export default Vue.extend({
   //layout: 'Top',
   layout({store}) {
     console.log('store.state.loggedIn:', store.state.loggedIn);
-    return store.state.loggedIn ? 'Top' : 'Welcome';
+    //return store.state.loggedIn ? 'Top' : 'Welcome';
+    return 'Welcome';
   },
   /*async fetch() {
       this.posts = await axios.get(url);
