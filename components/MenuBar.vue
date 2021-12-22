@@ -1,0 +1,39 @@
+<template>
+    <v-app-bar app dark dense>
+        <v-app-bar-nav-icon />
+        <v-toolbar-title>Page title</v-toolbar-title>
+        <v-spacer />
+        <v-btn text>
+            言語
+        </v-btn>
+        <v-btn text to="/signin">
+            ログイン
+        </v-btn>
+        <v-btn 
+            class="ma-2"
+            outlined 
+            color="white"
+            >
+            無料会員登録
+        </v-btn>
+
+        <v-btn icon>
+          <v-icon>mdi-magnify</v-icon>
+        </v-btn>
+    </v-app-bar>
+</template>
+<script lang="ts">
+import Vue from 'vue'
+export default Vue.extend({
+  props: {
+      
+  },
+  data() {
+    return {
+      posts: []
+    }
+  },
+})
+</script>
+<style>
+</style>
