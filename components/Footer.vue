@@ -1,16 +1,12 @@
 <template>
-    <footer>
-        <p class="copyright"><span>&copy;OmataR WebApp</span></p>
-    </footer>
+    <v-footer app>
+        <v-col 
+            cols="12"
+            class="text-center"
+        >
+            &copy;OmataR WebApp
+        </v-col>
+    </v-footer>
 </template>
 <style lang="scss" scoped>
-    footer {
-        background-color: #eeee;
-        text-align: center;
-        color: #000;
-        position: absolute;
-        bottom: 0;
-        width: 100%;
-        padding: 15px 0;
-    }
 </style>
