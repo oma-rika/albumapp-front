@@ -1,10 +1,13 @@
 <template>
-  <section>
+  <v-app>
     <Header />
-    <div class="container">
-      <p>This is Top Page!!</p>
-    </div>
-  </section>
+    <v-main>
+        <v-container>
+            <LinkCards />
+        </v-container>
+    </v-main>
+    <Footer />
+  </v-app>
 </template>
 
 <script lang="ts">
