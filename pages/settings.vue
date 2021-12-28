@@ -70,7 +70,6 @@
                                                     <v-btn
                                                         disabled
                                                         block
-                                                        
                                                     >
                                                         更新する
                                                     </v-btn>
@@ -121,7 +120,6 @@
                                                 <v-btn
                                                     disabled
                                                     block
-                                                    
                                                 >
                                                     更新する
                                                 </v-btn>
