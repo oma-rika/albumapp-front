@@ -43,7 +43,6 @@ export default {
     '@nuxtjs/axios',
     // https://go.nuxtjs.dev/pwa
     '@nuxtjs/pwa',
-    'bootstrap-vue/nuxt',
   ],
   serverMiddleware: [
     {path: '/api/', handler: '~/server/api.js'}
