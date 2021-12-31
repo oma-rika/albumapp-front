@@ -39,14 +39,14 @@ export default Vue.extend({
             const msg = `${minLength}です。半角英数記号が使えます。`
             //ログインページ=入力必須
             //会員登録ページ=入力必須,8文字以上,72文字以下,書式チェック
-            const require = (value: string) => !!value || '';
+            const required = (value: string) => !!value || '';
             const format = (value: string) => /^[\w-@!#,.$]{8,72}$/.test(value) || msg;
             const rules = this.setValidation ? [format] : [required];
             const hint = this.setValidation ? msg : undefined;
             const placeholder = this.setValidation ? minLength : undefined;
             return { rules, hint, placeholder}
         },
-        toggle () {
+        toggle (): any {
             const icon = this.show ? 'mdi-eye' : 'mdi-eye-off'
             const type = this.show ? 'text' : 'password'
             return { icon, type }

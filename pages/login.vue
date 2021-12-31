@@ -10,35 +10,58 @@
                             sm="10"
                             md="8"
                             lg="6"
+                            align="center"
                         >
-                            <v-form>
-                                <v-card ref="form" class="mt-12">
-                                    <v-card-title>
-                                        ログイン
-                                    </v-card-title>
-                                    <v-card-text class="pb-0">
-                                            <v-text-field
-                                                label="メールアドレス"
-                                                outlined
-                                            ></v-text-field>
-                                            <v-text-field
-                                                label="パスワード"
-                                                outlined
-                                            ></v-text-field>
-                                    </v-card-text>
-                                    <!--<v-divider></v-divider>-->
-                                    <v-card-actions class="pt-4 pb-4 pr-0 pl-0 mr-4 ml-4">
-                                        <v-btn
-                                        color="primary"
-                                        x-large
-                                        block
-                                        @click="submit"
+                            <v-card
+                                ref="form"
+                                class="mt-12"
+                                max-width="350"
+                            >
+                                <v-card-title>
+                                    ログイン
+                                </v-card-title>
+                                <v-card-text class="pb-0">
+                                        <v-form
+                                            ref="form"
+                                            v-model="isValid"
                                         >
-                                        ログイン
-                                        </v-btn>
-                                    </v-card-actions>
-                                </v-card>
-                            </v-form>
+                                            <user-form-email
+                                                :email.sync="params.user.email"
+                                             />
+                                            <user-form-password
+                                                :password.sync="params.user.password"
+                                             />
+                                             <v-card-actions>
+                                                <nuxt-link
+                                                    to="#"
+                                                >パスワードを忘れた場合はこちら
+                                                </nuxt-link>
+                                             </v-card-actions>
+                                            <v-btn
+                                                color="primary"
+                                                x-large
+                                                block
+                                                @click="submit"
+                                                :disabled="!isValid"
+                                                :loading="loading"
+                                                class="white--text"
+                                            >
+                                                ログイン
+                                            </v-btn>
+                                        </v-form>
+                                        {{ params }}
+                                </v-card-text>
+                                <v-card-actions class="pt-4 pb-4 pr-0 pl-0 mr-4 ml-4">
+                                    <!--<v-btn
+                                    color="primary"
+                                    x-large
+                                    block
+                                    @click="submit"
+                                    >
+                                    ログイン
+                                    </v-btn>-->
+                                </v-card-actions>
+                            </v-card>
                         </v-col>
                     </v-row>
                 </v-container>
@@ -47,3 +70,22 @@
         </v-app>
     </section>
 </template>
+
+<script lang="ts">
+import Vue from 'vue'
+export default Vue.extend({
+  data() {
+    return {
+      isValid: false,
+      name: 'qqq',
+      params: {
+          user: {
+              name: '',
+              email: '',
+              password: ''
+          }
+      }
+    }
+  },
+})
+</script>
