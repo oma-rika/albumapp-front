@@ -13,7 +13,6 @@
                             align="center"
                         >
                             <v-card
-                                ref="form"
                                 class="mt-12"
                                 max-width="350"
                             >
@@ -31,36 +30,30 @@
                                             <user-form-password
                                                 :password.sync="params.user.password"
                                              />
-                                             <v-card-actions>
+                                            <v-card-actions class="px-0 py-0">
+                                                <v-btn
+                                                    color="primary"
+                                                    x-large
+                                                    block
+                                                    @click="login"
+                                                    :disabled="!isValid || loading"
+                                                    :loading="loading"
+                                                    class="white--text"
+                                                >
+                                                    ログイン
+                                                </v-btn>
+                                            </v-card-actions>
+                                            <v-card-actions class="px-0">
                                                 <nuxt-link
                                                     to="#"
-                                                >パスワードを忘れた場合はこちら
+                                                    class="body-2 text-decoration-none"
+                                                >
+                                                    パスワードを忘れた場合はこちら
                                                 </nuxt-link>
-                                             </v-card-actions>
-                                            <v-btn
-                                                color="primary"
-                                                x-large
-                                                block
-                                                @click="submit"
-                                                :disabled="!isValid"
-                                                :loading="loading"
-                                                class="white--text"
-                                            >
-                                                ログイン
-                                            </v-btn>
+                                            </v-card-actions>
                                         </v-form>
                                         {{ params }}
                                 </v-card-text>
-                                <v-card-actions class="pt-4 pb-4 pr-0 pl-0 mr-4 ml-4">
-                                    <!--<v-btn
-                                    color="primary"
-                                    x-large
-                                    block
-                                    @click="submit"
-                                    >
-                                    ログイン
-                                    </v-btn>-->
-                                </v-card-actions>
                             </v-card>
                         </v-col>
                     </v-row>
@@ -77,15 +70,23 @@ export default Vue.extend({
   data() {
     return {
       isValid: false,
-      name: 'qqq',
+      loading: false,
       params: {
           user: {
-              name: '',
               email: '',
               password: ''
           }
       }
     }
   },
+  methods: {
+      login() {
+          this.loading = true;
+          setTimeout(() => {
+              this.$refs.form.reset()
+              this.loading = false;
+          }, 1500)
+      }
+  }
 })
 </script>

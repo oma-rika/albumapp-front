@@ -6,7 +6,7 @@
         @input="$emit('update:password', $event)"
         label="パスワードを入力"
         :placeholder="form.placeholder"
-        hide-detailes=!setValidation
+        :hide-detailes=!setValidation
         :counter="setValidation"
         :append-icon="toggle.icon"
         :type="toggle.type"

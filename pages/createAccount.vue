@@ -13,7 +13,6 @@
                             align="center"
                         >
                             <v-card
-                                ref="form"
                                 class="mt-12"
                                 max-width="350"
                             >
@@ -21,7 +20,8 @@
                                     ログイン
                                 </v-card-title>
                                 <v-card-text class="pb-0">
-                                        <v-form
+                                        <v-form 
+                                            ref="form"
                                             v-model="isValid"
                                         >
                                             <user-form-name
@@ -39,25 +39,16 @@
                                                 color="primary"
                                                 x-large
                                                 block
-                                                @click="submit"
-                                                :disabled="!isValid"
+                                                @click="signup"
+                                                :disabled="!isValid || loading"
+                                                :loading="loading"
                                                 class="white--text"
                                             >
-                                                ログイン
+                                                新規登録
                                             </v-btn>
                                         </v-form>
                                         {{ params }}
                                 </v-card-text>
-                                <v-card-actions class="pt-4 pb-4 pr-0 pl-0 mr-4 ml-4">
-                                    <!--<v-btn
-                                    color="primary"
-                                    x-large
-                                    block
-                                    @click="submit"
-                                    >
-                                    ログイン
-                                    </v-btn>-->
-                                </v-card-actions>
                             </v-card>
                         </v-col>
                     </v-row>
@@ -74,7 +65,8 @@ export default Vue.extend({
   data() {
     return {
       isValid: false,
-      name: 'qqq',
+      loading: false,
+      name: '',
       params: {
           user: {
               name: '',
@@ -84,5 +76,20 @@ export default Vue.extend({
       }
     }
   },
+  methods: {
+      signup() {
+          this.loading = true;
+          setTimeout(() => {
+              // Vuetify $refs.form.reset giving errors 
+              // `https://stackoverflow.com/questions/51059402`
+              const refForm: any = this.$refs.form;
+              refForm.reset();
+              for (const key in this.params.user) {
+                  this.params.user[key] = '';
+              }
+              this.loading = false;
+          }, 1500)
+      }
+  }
 })
 </script>

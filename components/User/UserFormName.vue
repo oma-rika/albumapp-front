@@ -27,7 +27,7 @@ export default Vue.extend({
                 //入力必須
                 (value: string) => !!value || '',
                 //30文字まで
-                (value: string) => value.length <= maxLength || `${maxLength}文字以内で入力してください`
+                (value: string) => (!!value && value.length <=  maxLength) || `${maxLength}文字以内で入力してください`
             ]
         }
     }
