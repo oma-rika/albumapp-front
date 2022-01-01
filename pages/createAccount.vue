@@ -17,7 +17,7 @@
                                 max-width="350"
                             >
                                 <v-card-title>
-                                    ログイン
+                                    アカウントを作成
                                 </v-card-title>
                                 <v-card-text class="pb-0">
                                         <v-form 
