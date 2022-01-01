@@ -84,9 +84,14 @@ export default Vue.extend({
               // `https://stackoverflow.com/questions/51059402`
               const refForm: any = this.$refs.form;
               refForm.reset();
-              for (const key in this.params.user) {
-                  this.params.user[key] = '';
-              }
+              //初期化する
+              this.params = {
+                    user: {
+                        name: '',
+                        email: '',
+                        password: ''
+                    }
+              };
               this.loading = false;
           }, 1500)
       }
