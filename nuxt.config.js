@@ -43,6 +43,9 @@ export default {
     '@nuxtjs/axios',
     // https://go.nuxtjs.dev/pwa
     '@nuxtjs/pwa',
+    //https://i18n.nuxtjs.org/
+    '@nuxtjs/i18n',
+    
   ],
   serverMiddleware: [
     {path: '/api/', handler: '~/server/api.js'}
@@ -68,6 +71,21 @@ export default {
           error: 'FB8678',
           background: 'f6f6f4'
         }
+      }
+    },
+  },
+  // Doc: https://nuxt-community.github.io/nuxt-i18n/basic-usage.html#nuxt-link
+  i18n: {
+    locales: ['ja', 'en'],
+    defaultLocale: 'ja',
+    // Doc: https://kazupon.github.io/vue-i18n/api/#properties
+    vueI18n: {
+      fallbackLocale: 'ja',
+      // silentTranslationWarn: true,
+      silentFallbackWarn: true,
+      messages: {
+        ja: require('./locales/ja.json'),
+        en: require('./locales/en.json')
       }
     }
   },
