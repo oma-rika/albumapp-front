@@ -32,6 +32,7 @@
             <v-list-item
               v-for="(item, i ) in items"
               :key="i"
+              :to="item.href"
             >
               <v-list-item-icon>
                 <v-icon v-text="item.icon"></v-icon>
@@ -54,9 +55,9 @@ export default Vue.extend({
   data() {
     return {
       items: [
-        { text: 'ダッシュボード', icon: 'mdi-view-dashboard-outline'},
-        { text: 'アカウント設定', icon: 'mdi-account-cog-outline'},
-        { text: 'ログアウト', icon: 'mdi-logout-variant'},
+        { text: 'ダッシュボード', icon: 'mdi-view-dashboard-outline', href: 'dashboard'},
+        { text: 'アカウント設定', icon: 'mdi-account-cog-outline', href: 'settings'},
+        { text: 'ログアウト', icon: 'mdi-logout-variant', href: ''},
       ]
     }
   },
