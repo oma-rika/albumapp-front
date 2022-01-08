@@ -38,15 +38,32 @@ app.use(cors());
 //const uuid = require('uuid');
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
-
-
 const mysql = require('mysql');
+const session = require('express-session');
 
 const connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     database: 'albumapp',
     password: '*****',　//2021-11-18 PassWordChange
+});
+
+//express-sessionを使うために必要な情報を張り付ける
+app.use(
+    session({
+        secret: 'my_secret_key',
+        resave: false,
+        saveUninitialized: false,
+    })
+);
+
+app.use((req, res, next) => {
+    if (req.session.userId == undefined) {
+        console.log('ログインしていません');
+    } else {
+        console.log('ログインしています');
+    }
+    next();
 });
 
 connection.connect((err) => {
@@ -83,11 +100,6 @@ connection.connect((err) => {
 //     connection.end();
 // });
 
-app.listen(3010, () => {
-    console.log('api');
-});
-
-
 //app.set('views', __dirname + '/views');
 //app.set('view engine', 'ejs');
 
@@ -111,16 +123,24 @@ app.post('/login', cors(), (req, res) => {
         [req.body.emailAddress, req.body.passWord],
         (error, results) => {
             if (results.length > 0) {
-                console.log('該当するユーザーがおりました');
+                console.log('該当するユーザーがいました');
+                if (req.body.passWord === results[0].Password) {
+                    req.session.userId = results[0].ID;
+                    console.log('req.session.userId:', req.session.userId);
+                } else {
+                    console.log('パスワードが一致しない');
+                }
                 resMessage = 'ok';
+                res.status(200).json({status: resMessage, items: results});
             } else {
                 console.log('該当するユーザーはいない');
-                resMessage = 'notAccount';
+                resMessage = 'NotFound';
+                res.status(404).send({status: resMessage, items: results});
             }
-            res.status(200).json({status: resMessage, items: results});
+            //res.status(200).json({status: resMessage, items: results});
         }
     );
-    connection.end();
+    //connection.end();
 });
 
 app.post('/api', cors(), (req, res) => {
@@ -141,7 +161,7 @@ app.post('/api', cors(), (req, res) => {
             res.status(200).send('新規登録完了！');
         }
     );
-    connection.end();
+    //connection.end();
 });
 
 app.post('/fileUpload', cors(), (req, res) => {
@@ -160,5 +180,9 @@ app.post('/fileUpload', cors(), (req, res) => {
         }
     );
     //connection.end();
+});
+
+app.listen(3010, () => {
+    console.log('api');
 });
 
