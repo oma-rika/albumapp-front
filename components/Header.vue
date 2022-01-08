@@ -33,6 +33,7 @@
               v-for="(item, i ) in items"
               :key="i"
               :to="item.href"
+              @click="item.text !== 'ログアウト' || logout()"
             >
               <v-list-item-icon>
                 <v-icon v-text="item.icon"></v-icon>
@@ -61,6 +62,12 @@ export default Vue.extend({
       ]
     }
   },
+  methods: {
+    async logout() {
+      await this.$store.dispatch("getLogout")
+      return this.$router.push('/');
+    }
+  }
 })
 </script>
 <style>
