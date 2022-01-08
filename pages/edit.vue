@@ -1,73 +1,100 @@
 <template>
-    <section>
-        <header />
-        <div class="container">
-            <h1 class="fs-5 fw-normal form-h1">Data Files Upload</h1>
-            <p>取り込むデータを選択</p>
-            <!--<el-upload
-                class="upload-demo"
-                ref="upload"
-                drag
-                action="https://jsonplaceholder.typicode.com/posts/"
-                :auto-upload="false"
-                :on-preview="handlePreview"
-                :on-remove="handleRemove"
-                :file-list="fileList"
-            multiple>
-            <i class="el-icon-upload"></i>
-            <div class="el-upload__text">Drop file here or <em>click to upload</em></div>
-            <div class="el-upload__tip" slot="tip">jpg/png files with a size less than 500kb</div>
-            </el-upload>
-            <div class="form-group">
-                <el-button type="success" @click="submitUpload">upload to server</el-button>
-                <el-button type="info" @click="chancelBtn" class="btn">キャンセルする</el-button>
-            </div>-->
-
-            <br /><br /><br />
-
-            <!--<el-button @click="visible = true">Button</el-button>-->
-            <!--<div class="form-group">
-                <label for="selectFile" class="form-label">取り込むデータを選択</label>
-                <input type="file" v-on:change="handleFile" id="selectFile" class="form-control">
-            </div>
-            <div class="form-group">
-                <button @click="showImageFile" type="button" class="btn btn-primary">ファイル内容を表示</button>
-            </div>-->
-            <div class="form-group">
-                <label for="selectFile" class="form-label">取り込むデータを選択</label>
-                <input type="file" accept="image/*" @change="readImage" id="selectImage" class="form-control" />
-            </div>
-            [{{binaryFile}}]
-            <!--<div class="image-preview">
-                <img src="/images/dummy.jpg" v-if="!binaryFile" alt="プレビュー画像" />
-                <img :src="binaryFile" v-if="binaryFile" alt="プレビュー画像" />
-            </div>-->
-            <div class="showImageFile">
-                <img id="disp" :src="binaryFile" v-if="binaryFile.length > 0" />
-            </div>
-            <div class="form-group">
-                <button type="button" @click="updateBinaryData" class="btn btn-primary">データを取り込む</button>
-                <button type="button" @click="chancelBtn" class="btn btn-secondary">キャンセルする</button>
-            </div>
-        </div>
+    <v-app>
+        <Header />
+        <v-main>
+            <v-row justify="center">
+                <v-col 
+                    cols="12"
+                    align="center"
+                >
+                    <v-card
+                        class="mt-12"
+                        max-width="600"
+                    >
+                        <v-card-title>File Upload</v-card-title>
+                        <v-card-text>
+                            <v-file-input
+                                label="取り込むデータを選択"
+                                v-model="filename"
+                                accept="image/*"
+                                filled
+                                prepend-icon="mdi-camera"
+                                type="file"
+                                @change="readImageTest"
+                            ></v-file-input>
+                        </v-card-text>
+                    </v-card>
+                    <v-spacer />
+                    <v-card
+                        v-if="binaryFile"
+                        class="mt-12"
+                        max-width="600"
+                    >
+                        <v-card-title>取り込んだデータを表示</v-card-title>
+                        <v-card-text>
+                            <!--[{{ binaryFile  }}]-->
+                            <div class="d-flex flex-column justify-space-between align-center">
+                                <v-slider
+                                    v-model="width"
+                                    class="align-self-stretch"
+                                    min="200"
+                                    max="500"
+                                    step="1"
+                                ></v-slider>
+                            
+                                <v-img
+                                    :aspect-ratio="16/9"
+                                    :width="width"
+                                    :src="binaryFile"
+                                    contain
+                                ></v-img>
+                            </div>
+                        </v-card-text>
+                        <v-card-actions>
+                            <v-spacer />
+                            <v-btn
+                                color="blue-grey"
+                                class="ma-2 white--text"
+                                @click="chancelBtn"
+                                :loading="loading"
+                            >
+                                Cancel
+                            </v-btn>
+                            <v-btn
+                                color="info"
+                                class="ma-2 white--text"
+                                @click="readImage"
+                            >
+                                Upload
+                                <v-icon
+                                    right
+                                    dark
+                                >
+                                    mdi-cloud-upload
+                                </v-icon>
+                            </v-btn>
+                        </v-card-actions>
+                    </v-card>   
+                </v-col>
+            </v-row>
+        </v-main>
         <Footer />
-    </section>
+    </v-app>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
 import ElementUI from 'element-ui'
-//import locale from 'element-ui/lib/locale/lang/ja'
 import axios from 'axios'
 import { v4 as uuid } from 'uuid';
-
-
-
 
 export default Vue.extend({
     data() {
         return {
             binaryFile: '',
+            loading: false,
+            width: 300,
+            filename: '',
         }
     },
     methods: {
@@ -89,7 +116,32 @@ export default Vue.extend({
                 })
             }
         },
+        readImageTest(e: any): void{
+            console.log('readImageTest');
+            if (e) {
+                //const inputImage = (<HTMLInputElement>document.getElementById('selectImage'))!.files[0];
+                const inputImage = e;
+                const reader = new FileReader();
+                reader.readAsDataURL(inputImage);
+                reader.onload = (e) => {
+                    if (e.target) {
+                        console.log('test:', new ArrayBuffer(10));
+                        //https://stackoverflow.com/questions/52955710
+                        const csv: string = e.target.result as string;
+                        if (typeof csv === 'string') {
+                            this.binaryFile = csv;
+                        } else {
+                            this.binaryFile = Buffer.from(csv).toString();
+                        }
+                    }
+                }
+                reader.onerror = (e) => {
+                    alert('読み取り時にエラーが発生しました');
+                }
+            }
+        },
         readImage (event: any): void {
+            console.log('readImage');
             if (event.target.files && event.target.files[0]) {
                 //const inputImage = (<HTMLInputElement>document.getElementById('selectImage'))!.files[0];
                 const inputImage = event.target.files[0];
@@ -113,7 +165,12 @@ export default Vue.extend({
             }
         },
         chancelBtn (): void {
-             this.binaryFile = '';
+            this.loading = true;
+            setTimeout(() => {
+                this.binaryFile = '';
+                this.filename = '';
+                this.loading = false;
+            }, 500);
         }
         // submitUpload() {
         //     console.log('click:');
@@ -134,23 +191,4 @@ export default Vue.extend({
 </script>
 
 <style>
-  header {
-    background-color: #24292e;
-    padding: 5px 20px;
-    height: 40px;
-    display: flex;
-  }
-
-  .main,
-  .edit-action {
-      margin: 0 auto;
-  }
-
-  .signin-button {
-    padding: 4px 8px;
-    border-radius: 3px;
-    border: 1px solid #fff;
-    color: #fff;
-    background: transparent;
-  }
 </style>
