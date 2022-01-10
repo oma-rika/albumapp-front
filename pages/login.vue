@@ -20,39 +20,39 @@
                                     ログイン
                                 </v-card-title>
                                 <v-card-text class="pb-0">
-                                        <v-form
-                                            ref="form"
-                                            v-model="isValid"
-                                        >
-                                            <user-form-email
-                                                :email.sync="params.user.email"
-                                             />
-                                            <user-form-password
-                                                :password.sync="params.user.password"
-                                             />
-                                            <v-card-actions class="px-0 py-0">
-                                                <v-btn
-                                                    color="primary"
-                                                    x-large
-                                                    block
-                                                    @click="login"
-                                                    :disabled="!isValid || loading"
-                                                    :loading="loading"
-                                                    class="white--text"
-                                                >
-                                                    ログイン
-                                                </v-btn>
-                                            </v-card-actions>
-                                            <v-card-actions class="px-0">
-                                                <nuxt-link
-                                                    to="#"
-                                                    class="body-2 text-decoration-none"
-                                                >
-                                                    パスワードを忘れた場合はこちら
-                                                </nuxt-link>
-                                            </v-card-actions>
-                                        </v-form>
-                                        {{ params }}
+                                    <v-form
+                                        ref="form"
+                                        v-model="isValid"
+                                    >
+                                        <UserFormEmail
+                                            :email.sync="params.user.email"
+                                            />
+                                        <userFormPassword
+                                            :password.sync="params.user.password"
+                                            />
+                                        <v-card-actions class="px-0 py-0">
+                                            <v-btn
+                                                color="primary"
+                                                x-large
+                                                block
+                                                @click="login"
+                                                :disabled="!isValid || loading"
+                                                :loading="loading"
+                                                class="white--text"
+                                            >
+                                                ログイン
+                                            </v-btn>
+                                        </v-card-actions>
+                                        <v-card-actions class="px-0">
+                                            <nuxt-link
+                                                to="#"
+                                                class="body-2 text-decoration-none"
+                                            >
+                                                パスワードを忘れた場合はこちら
+                                            </nuxt-link>
+                                        </v-card-actions>
+                                    </v-form>
+                                    {{ params }}
                                 </v-card-text>
                             </v-card>
                         </v-col>
@@ -83,7 +83,6 @@ export default Vue.extend({
       login() {
           this.loading = true;
           setTimeout(() => {
-              this.$refs.form.reset()
               this.loading = false;
           }, 1500)
       }
