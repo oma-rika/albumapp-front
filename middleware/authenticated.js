@@ -1,6 +1,6 @@
-export default function ({ store, redirect }) {
+export default async ({ store, redirect }) => {
     // ユーザーが認証されていない場合
-    // if (!store.state.authenticated) {
-    //     return redirect('/')
-    // }
+    if (!store.state.loggedIn) {
+         return await redirect('/signin');
+    }
 }
