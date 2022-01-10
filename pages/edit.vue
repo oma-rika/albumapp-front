@@ -63,7 +63,7 @@
                             <v-btn
                                 color="info"
                                 class="ma-2 white--text"
-                                @click="readImage"
+                                @click="updateBinaryData"
                             >
                                 Upload
                                 <v-icon
@@ -89,6 +89,7 @@ import axios from 'axios'
 import { v4 as uuid } from 'uuid';
 
 export default Vue.extend({
+    middleware: 'authenticated',
     data() {
         return {
             binaryFile: '',
@@ -100,6 +101,7 @@ export default Vue.extend({
     methods: {
         // データベースにPOSTする
         updateBinaryData (): void {
+            this.loading = false;
             console.log('click');
             //Generate a v4 (random) id
             const guid: string = uuid();
@@ -111,10 +113,13 @@ export default Vue.extend({
                     imageId: guid,
                     imagePath: this.binaryFile,
                 }).then((response) => {
-
+                    
                     console.log('response', response);
                 })
             }
+            setTimeout(() => {
+                this.loading = false;
+            }, 500);
         },
         readImageTest(e: any): void{
             console.log('readImageTest');
