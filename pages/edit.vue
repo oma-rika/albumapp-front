@@ -7,6 +7,47 @@
                     cols="12"
                     align="center"
                 >
+                    <!-- 送信成功メッセージ -->
+                    <v-fade-transition>
+                    <v-alert
+                        dense
+                        text
+                        type="success"
+                        class="mt-12"
+                        max-width="600"
+                        transition="fade-transition"
+                        v-if="uploadSuccessfulFlag"
+                    >
+                        アップロードに成功しました。
+                    </v-alert>
+
+                    <!-- 送信エラーメッセージ -->
+                    <v-alert
+                        dense
+                        outlined
+                        type="error"
+                        class="mt-12"
+                        max-width="600"
+                        transition="fade-transition"
+                        v-if="uploadErrorMsgFlag"
+                    >
+                        送信に失敗しました。しばらく経ってから再度お試し下さい。
+                    </v-alert>
+
+                    <!-- 読み込みエラーメッセージ -->
+                    <v-alert
+                        dense
+                        outlined
+                        type="error"
+                        class="mt-12"
+                        max-width="600"
+                        transition="fade-transition"
+                        v-if="readErrorMsgFlag"
+                    >
+                        取り込みに失敗しました。再度お試し下さい。
+                    </v-alert>
+                    </v-fade-transition>
+
                     <v-card
                         class="mt-12"
                         max-width="600"
@@ -20,7 +61,7 @@
                                 filled
                                 prepend-icon="mdi-camera"
                                 type="file"
-                                @change="readImageTest"
+                                @change="readImage"
                             ></v-file-input>
                         </v-card-text>
                     </v-card>
@@ -55,7 +96,7 @@
                             <v-btn
                                 color="blue-grey"
                                 class="ma-2 white--text"
-                                @click="chancelBtn"
+                                @click="cancelButton"
                                 :loading="loading"
                             >
                                 Cancel
@@ -96,6 +137,9 @@ export default Vue.extend({
             loading: false,
             width: 300,
             filename: '',
+            readErrorMsgFlag: false,
+            uploadErrorMsgFlag: false,
+            uploadSuccessfulFlag: false,
         }
     },
     methods: {
@@ -106,23 +150,44 @@ export default Vue.extend({
             //Generate a v4 (random) id
             const guid: string = uuid();
             console.log('guild:', guid);
+            const userId = this.$store.getters.getCurrentUserId;
+            console.log('UserId:', userId);
             if (this.binaryFile.length > 0) {
                 axios.post('http://localhost:3010/fileUpload', {
                     //テストで暫定で1を選択
-                    userId: 1,
+                    userId: userId,
                     imageId: guid,
                     imagePath: this.binaryFile,
-                }).then((response) => {
-                    
+                }).then(response => {
                     console.log('response', response);
+                    this.uploadSuccessful(response);
+                }).catch(error => {
+                    this.uploadFailure(error);
                 })
             }
             setTimeout(() => {
                 this.loading = false;
             }, 500);
         },
-        readImageTest(e: any): void{
-            console.log('readImageTest');
+        async uploadSuccessful(response:any) {
+            if (response) {
+                this.uploadSuccessfulFlag = true;
+                setTimeout(() => {
+                    this.uploadSuccessfulFlag = false;
+                }, 2500);
+                await this.resetVal();
+            }
+        },
+        uploadFailure({response}:{response:any}) {
+            if (response && response.status === 500) {
+                this.uploadErrorMsgFlag = true;
+                setTimeout(() => {
+                    this.uploadErrorMsgFlag = false;
+                }, 2500);    
+            }
+        },
+        readImage(e: any): void{
+            console.log('readImage');
             if (e) {
                 //const inputImage = (<HTMLInputElement>document.getElementById('selectImage'))!.files[0];
                 const inputImage = e;
@@ -141,14 +206,17 @@ export default Vue.extend({
                     }
                 }
                 reader.onerror = (e) => {
-                    alert('読み取り時にエラーが発生しました');
+                    //読み込みエラー
+                    this.readErrorMsgFlag = true;
+                    setTimeout(() => {
+                        this.readErrorMsgFlag = false;
+                    }, 2500); 
                 }
             }
         },
-        readImage (event: any): void {
+        /*readImage (event: any): void {
             console.log('readImage');
             if (event.target.files && event.target.files[0]) {
-                //const inputImage = (<HTMLInputElement>document.getElementById('selectImage'))!.files[0];
                 const inputImage = event.target.files[0];
                 const reader = new FileReader();
                 reader.readAsDataURL(inputImage);
@@ -168,14 +236,19 @@ export default Vue.extend({
                     alert('読み取り時にエラーが発生しました');
                 }
             }
-        },
-        chancelBtn (): void {
+        },*/
+        cancelButton (): void {
             this.loading = true;
             setTimeout(() => {
-                this.binaryFile = '';
-                this.filename = '';
+                this.resetVal();
                 this.loading = false;
             }, 500);
+        },
+        resetVal(): void {
+            console.log('初期化する');
+            this.binaryFile = '';
+            this.filename = '';
+            this.loading = false;
         }
         // submitUpload() {
         //     console.log('click:');
