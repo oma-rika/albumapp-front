@@ -60,6 +60,7 @@ app.use(
 app.use((req, res, next) => {
     if (req.session.userId == undefined) {
         console.log('ログインしていません');
+        //res.redirect('/signin');
     } else {
         console.log('ログインしています');
     }
@@ -141,6 +142,31 @@ app.post('/login', cors(), (req, res) => {
         }
     );
     //connection.end();
+});
+
+app.get('/albums/:userId/:limit', cors(), (req, res) => {
+    console.log('画像一覧を取得');
+    const userId = req.params.userId;
+    console.log('userId:', userId);
+    const limit = req.params.limit * 10;
+    const sql = 'SELECT id, UserId, Path, UpdateTime, favorite FROM albumapp.image_db WHERE UserId = ? LIMIT ?;';
+    let resMessage;
+    connection.query(
+        sql,
+        [userId, limit],
+        (error, results) => {
+            console.log('results:', results);
+            if (error) {
+                res.status(500).send('Internal Error.');
+            }
+            if (results.length > 0) {
+                resMessage = 'ok';
+            } else {
+                resMessage = 'NotFound';
+            }
+            res.status(200).json({status: resMessage, items: results});
+        }
+    );
 });
 
 app.post('/api', cors(), (req, res) => {
