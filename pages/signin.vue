@@ -123,15 +123,12 @@ export default Vue.extend({
                     //console.log('this.auth:', this.auth);
                     console.log('response.data.items:', response.data.items[0]);
                     this.$store.dispatch("updateMessageAction", response.data.items[0]);
-                    this.$store.dispatch("login")
                     //this.auth = response.data.items[0];
                     //成功したらリダイレクト
                     this.$router.push('project');
                     break;
                 default:
                     console.log('notAccount');
-                    //20211114追加
-                    //後程修正する
                     this.failure = true;
                     break;
             }
