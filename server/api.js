@@ -169,6 +169,24 @@ app.get('/albums/:userId/:limit', cors(), (req, res) => {
     );
 });
 
+app.post('/favorite', cors(), (req, res) => {
+    console.log('お気に入り登録');
+    //console.log('req.body.id', req.body.id);
+    //console.log('req.body.userId', req.body.userId);
+    //console.log('req.body.favorite', req.body.favorite);
+    let like = req.body.favorite ? 1 : 0;
+    console.log('like', like);
+    let sql = 'UPDATE albumapp.image_db SET favorite=? WHERE id=? AND UserId=?';
+    connection.query(
+        sql,
+        [like, req.body.id, req.body.userId],
+        (error, results) => {
+            if (error) throw error;
+            res.status(200).send('送信完了');
+        }
+    );
+});
+
 app.post('/api', cors(), (req, res) => {
     console.log('post受け取り');
     //post値受け取れるか確認

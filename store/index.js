@@ -30,7 +30,7 @@ const createStore = () => {
         getters: {
             getCurrentUserId: (state, getters) => {
                 if (state.user.current) {
-                    return state.user.current;
+                    return state.user.current.ID;
                 } else {
                     console.log('ユーザーは存在しない');
                 }

@@ -48,7 +48,12 @@
                       <v-card-actions>
                           <v-spacer />
                           <v-btn icon>
-                              <v-icon>mdi-heart</v-icon>
+                              <v-icon
+                              @click="addFavorite(card)"
+                              :color="card.favorite ? 'red' : '' " 
+                              >
+                                mdi-heart
+                              </v-icon>
                           </v-btn>
                           <v-btn icon>
                               <v-icon>mdi-tray-arrow-down</v-icon>
@@ -70,7 +75,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import axios from 'axios'
+import axios, { AxiosError }  from 'axios'
 import https from 'https'
 import http from 'http'
 import { Buffer } from 'buffer';
@@ -95,7 +100,6 @@ export default Vue.extend({
       albums: {
 
       },
-      
     }
   },
   methods: {
@@ -105,6 +109,28 @@ export default Vue.extend({
       console.log('decodeObject:', decodeObject);
       const imagePath = decodeObject;
       return imagePath;
+    },
+    async addFavorite(card:any) {
+        console.log('card:', card);
+        //console.log('favoriteをクリック:', icon);
+        card.favorite = !card.favorite;
+        console.log('card.favorite:', card.favorite)
+        let p =  {
+            id: card.id,
+            userId: this.$store.getters.getCurrentUserId,
+            favorite: card.favorite
+        };
+        await axios.post('http://localhost:3010/favorite/', p).then(response => {
+          this.addFavoriteSuccessful(response);
+        }).catch(error => {
+          this.addFavoriteFailure(error);
+        });
+    },
+    addFavoriteSuccessful (response:any) {
+        console.log('成功');
+    },
+    addFavoriteFailure (error: AxiosError<{error: string}>) {
+      console.log('失敗');
     }
   },
 })
