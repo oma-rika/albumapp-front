@@ -13,12 +13,9 @@
             class="ma-2"
             outlined 
             color="white"
+            to="/signup"
             >
             無料会員登録
-        </v-btn>
-
-        <v-btn icon>
-          <v-icon>mdi-magnify</v-icon>
         </v-btn>
     </v-app-bar>
 </template>

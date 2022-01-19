@@ -1,81 +1,155 @@
 <template>
     <section>
-      <Header />
-      <div class="container">
-        <h1 class="fs-5 text-center fw-normal form-h1">アカウントを作成</h1>
-        <form action="http://localhost:3010/api" method="POST"　class="signup-form">
-            <div class="form-group">
-              <label for="name" class="form-label">ユーザー名</label>
-              <input type="text" id="name" class="form-control" placeholder="Please enter your name" v-model="name">
-            </div>
-            <div class="form-group">
-              <label for="e-mailaddress" class="form-label">メールアドレス</label>
-              <input type="text" id="e-mailaddress" class="form-control" placeholder="Please enter your e-mail address" v-model="mailAddress">
-            </div>
-            <div class="form-group">
-              <label for="possword" class="form-label">パスワード</label>
-              <input type="password" id="possword" name="password" class="form-control" aria-describedby="passwordHelpBlock" v-model="password">
-            </div>
-            <div class="form-group">
-                <button type="button" @click="signUp" class="btn btn-primary btn-block">新規登録</button>
-            </div>
-        </form>
-      </div>
+      <v-app>
+        <MenuBar />
+        <v-main>
+          <v-container fluid>
+            <!-- 登録完了メッセージ -->
+            <v-alert
+              dense
+              type="success"
+              class="mx-auto"
+              max-width="600"
+              transition="fade-transition"
+              v-if="createSuccessfulFlag"
+            >
+              登録完了しました。
+            </v-alert>
+
+            <!-- 登録失敗メッセージ -->
+            <v-alert
+                dense
+                outlined
+                type="error"
+                class="mx-auto"
+                max-width="600"
+                transition="fade-transition"
+                v-if="createErrorMsgFlag"
+            >
+                送信に失敗しました。しばらく経ってから再度お試し下さい。
+            </v-alert>
+
+            <v-row justify="center">
+                <v-col
+                    cols="12"
+                    sm="10"
+                    md="8"
+                    lg="6"
+                    align="center"
+                >
+                    <v-card
+                        class="mt-12"
+                        max-width="350"
+                    >
+                        <v-card-title>
+                            アカウントを作成
+                        </v-card-title>
+                        <v-card-text>
+                                <v-form 
+                                    ref="form"
+                                    v-model="isValid"
+                                    @submit.prevent="signup"
+                                >
+                                    <UserFormName
+                                        :name.sync="params.user.name"
+                                      />
+                                    <UserFormEmail
+                                        :email.sync="params.user.email"
+                                        placeholder
+                                      />
+                                    <UserFormPassword
+                                        :password.sync="params.user.password"
+                                        set-validation
+                                      />
+                                    <v-btn
+                                        type="submit"
+                                        color="primary"
+                                        x-large
+                                        block
+                                        @click="signup"
+                                        :disabled="!isValid || loading"
+                                        :loading="loading"
+                                        class="white--text"
+                                    >
+                                        新規登録
+                                    </v-btn>
+                                </v-form>
+                                <!--{{ params }} -->
+                        </v-card-text>
+                    </v-card>
+                </v-col>
+            </v-row>
+          </v-container>
+        </v-main>
+      </v-app>
       <Footer />
     </section>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-import axios from 'axios'
+import axios, { AxiosError }  from 'axios'
 
 export default Vue.extend({
   data() {
     return {
-      name: '',
-      mailAddress: '',
-      password: '',
+      isValid: false,
+      loading: false,
+      createSuccessfulFlag: false,
+      createErrorMsgFlag: false,
+      params: {
+        user: {
+          name: '',
+          email: '',
+          password: ''
+        }
+      }
     }
   },
   methods: {
-    signUp(): void {
-      console.log('signUpClick');
-      axios.post('http://localhost:3010/api', {
-        UserName: this.name,
-        email: this.mailAddress,
-        password: this.password,
+    signup() {
+      this.loading = true;
+      console.log('name', this.params.user.name);
+      console.log('email', this.params.user.email);
+      console.log('password', this.params.user.password);
+      axios.post('http://localhost:3010/signup', {
+        UserName: this.params.user.name,
+        email: this.params.user.email,
+        password: this.params.user.password,
       })
-      .then(function (response) {
-        console.log('res:', response);
+      .then((response) => {
+        this.createSuccessful();
+      }).catch(error => {
+        this.createFailure(error);
       })
+    },
+    createSuccessful () {
+        this.createSuccessfulFlag = true;
+        setTimeout(() => {
+            // Vuetify $refs.form.reset giving errors 
+            // `https://stackoverflow.com/questions/51059402`
+            const refForm: any = this.$refs.form;
+            refForm.reset();
+            //初期化する
+            this.params = {
+                user: {
+                    name: '',
+                    email: '',
+                    password: ''
+                }
+            };
+          this.createSuccessfulFlag = false;
+          this.loading = false;
+        }, 1500)
+    },
+    createFailure (error: AxiosError<{error: string}>) {
+      console.log('エラー発生');
+      this.createErrorMsgFlag = true;
+      setTimeout(() => {
+        this.createErrorMsgFlag = false;
+      }, 2500);
     }
   }
 })
 </script>
-
-<style>
-    .form-h1 {
-        padding: 30px 0 0;
-    }
-    .signup-form {
-        width: 100%;
-        max-width: 410px;
-        padding: 0 15px 15px 15px;
-        margin: auto;
-    }
-    label {
-        display: block;
-    }
-
-    .btn-block {
-        display: block;
-        width: 100%;
-        text-align: center;
-    }
-
-    .form-group {
-        margin-top: 5px;
-        margin-bottom: 15px;
-    }
-</style>
 

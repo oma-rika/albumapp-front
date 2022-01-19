@@ -187,7 +187,7 @@ app.post('/favorite', cors(), (req, res) => {
     );
 });
 
-app.post('/api', cors(), (req, res) => {
+app.post('/signup', cors(), (req, res) => {
     console.log('post受け取り');
     //post値受け取れるか確認
     console.log(req.body.UserName);
@@ -202,6 +202,7 @@ app.post('/api', cors(), (req, res) => {
         sql,
         [req.body.UserName, req.body.email, req.body.password],
         (error, resuls) => {
+            if (error) throw error;
             res.status(200).send('新規登録完了！');
         }
     );
