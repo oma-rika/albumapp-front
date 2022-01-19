@@ -35,11 +35,32 @@ const app = express();
 
 const cors    = require('cors');
 app.use(cors());
-//const uuid = require('uuid');
+const uuid = require('uuid');
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 const mysql = require('mysql');
 const session = require('express-session');
+const multer = require('multer');
+const path = require('path');
+
+
+let storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        let destination = path.join(__dirname, '../updir'); // ./updir/
+
+        if (req.session && req.session.userId) {
+            destination = path.join(destination, 'users', req.session.userId, uuid()); // ./up/users/1/generated-uuid/
+        } else {
+            destination = path.join(destination, 'images'); // ./updir/tmp
+        }
+        
+        cb(null, destination);
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname)
+    }
+})
+
 
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -226,6 +247,16 @@ app.post('/fileUpload', cors(), (req, res) => {
     );
     //connection.end();
 });
+
+//app.post('/avatarUpload', multer({ dest: 'updir/' }).single('file'), (req, res) => {
+//    console.log('req.file', req.file);
+//    res.status(200).send('ファイルのアップロードが完了しました。');
+//});
+
+app.post('/avatarUpload', multer({ storage: storage }).single('file'), (req, res) => {
+   res.status(200).send('ファイルのアップロードが完了しました。');
+});
+
 
 app.listen(3010, () => {
     console.log('api');

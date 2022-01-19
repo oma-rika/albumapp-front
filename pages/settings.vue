@@ -20,24 +20,51 @@
                                         class="d-flex flex-column justify-center pt-4"
                                         align="center"    
                                     >
-                                        <!--<v-avatar
-                                            color="indigo"
-                                            size="120"
-                                        >
-                                        </v-avatar>-->
-                                        <v-badge
-                                            bordered
-                                            bottom
-                                            color="deep-purple accent-4"
-                                            icon="mdi-camera"
-                                            overlap
-                                            offset-x="30"
-                                            offset-y="30"
-                                        >
-                                            <v-icon size="100">
+                                        <v-avatar>
+                                            <v-icon 
+                                                size="100"
+                                                v-if="!avatarFilename"
+                                            >
                                                 mdi-account-circle
                                             </v-icon>
-                                        </v-badge>
+
+                                            <v-img
+                                                :aspect-ratio="16/9"
+                                                width="100"
+                                                :src="avatarFilename"
+                                                contain
+                                                v-if="avatarFilename"
+                                            ></v-img>
+                                        </v-avatar>
+
+                                        <v-form
+                                            ref="form"
+                                            v-model="isValid"
+                                            @submit.prevent="adminAvatar"
+                                        >
+                                            <!--<v-badge
+                                                bordered
+                                                bottom
+                                                color="deep-purple accent-4"
+                                                icon="mdi-camera"
+                                                overlap
+                                                offset-x="30"
+                                                offset-y="30"
+                                            >-->
+                                                    <v-file-input
+                                                        v-model="avatarFilename"
+                                                        accept="image/*"
+                                                        filled
+                                                        prepend-icon="mdi-camera"
+                                                        type="file"
+                                                        hide-input
+                                                        color="deep-purple"
+                                                        @change="adminAvatar"
+                                                        name="file"
+                                                    ></v-file-input>
+                                            <!--</v-badge>-->
+                                            [{{avatarFilename}}]
+                                        </v-form>
                                         <v-card>
                                             <v-card-title>ユーザー情報の変更</v-card-title>
                                             <v-card-subtitle>プロフィール情報を更新する場合はこちらから変更してください。</v-card-subtitle>
@@ -166,10 +193,14 @@
 </template>
 <script lang="ts">
 import Vue from 'vue'
+import axios from 'axios'
+
 export default Vue.extend({
   data() {
     return {
+      isValid: false,
       checkbox: false,
+      avatarFilename: '',
       headers: [
             {
                text: '更新したファイル名',
@@ -188,6 +219,20 @@ export default Vue.extend({
           {id: 5, filename: "Sample05.jpg", datetime: "2021/12/28 18:39"}, 
       ]
     }
+  },
+  methods: {
+      adminAvatar() {
+            if (this.avatarFilename) {
+                const formData = new FormData();
+                formData.append('file', this.avatarFilename);
+                axios.post('http://localhost:3010/avatarUpload', formData)
+                .then(response => {
+                    console.log({response});
+                }).catch(error => {
+                    console.log({error});
+                })
+            }
+      }
   }
 })
 </script>
