@@ -1,5 +1,5 @@
 <template>
-    <v-row align="center" class="pb-10 bg-color">
+    <v-row align="center" class="pb-10">
         <v-col
             cols="12"
             class="text-center"
@@ -17,11 +17,6 @@
     </v-row>
 </template>
 <style lang="scss">
-.bg-color {
-    background: #f5fafb;
-}
-
-
 </style>
 <script lang="ts">
 
