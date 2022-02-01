@@ -49,6 +49,7 @@
                                                     depressed
                                                     color="primary"
                                                     class="d-flex cameraIcon-position"
+                                                    style="border: 2px solid #fff"
                                                     v-bind="attrs"
                                                     v-on="on"
                                                 >
@@ -335,6 +336,5 @@ export default Vue.extend({
 .cameraIcon-position {
     bottom: 50px;
     left: 50px;
-    border: 2px solid #fff
 }
 </style>
