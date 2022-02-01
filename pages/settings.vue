@@ -20,7 +20,7 @@
                                         class="d-flex flex-column justify-center pt-4"
                                         align="center"    
                                     >
-                                        <v-avatar>
+                                        <v-avatar size="100">
                                             <v-icon 
                                                 size="100"
                                                 v-if="!avatarFilename"
@@ -34,14 +34,78 @@
                                                 :src="avatarFilename"
                                                 contain
                                                 v-if="avatarFilename"
-                                            ></v-img>
+                                            ></v-img>           
                                         </v-avatar>
+                                        <v-dialog
+                                            v-model="dialog"
+                                            width="300px"
+                                            dense
+                                        >
+                                            <template v-slot:activator="{ on, attrs}">
+                                                <v-btn
+                                                    fab
+                                                    x-small
+                                                    dark
+                                                    depressed
+                                                    color="primary"
+                                                    class="d-flex cameraIcon-position"
+                                                    v-bind="attrs"
+                                                    v-on="on"
+                                                >
+                                                    <v-icon dark>
+                                                        mdi-camera
+                                                    </v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <v-card>
+                                                    <v-card-actions
+                                                    >
+                                                        <v-file-input
+                                                            accept="image/*"
+                                                            label="画像をアップロード"
+                                                            outlined
+                                                            prepend-icon="mdi-camera"
+                                                            hide-details
+                                                            dense
+                                                            class="pt-2 pb-2"
+                                                        ></v-file-input>
+                                                    </v-card-actions>
+                                                    <v-divider />
+                                                    <v-card-actions
+                                                    >
+                                                        <v-btn text>デフォルト画像を表示</v-btn>
+                                                    </v-card-actions>
+                                                    <v-divider />
+                                                    <v-card-actions>
+                                                        <v-spacer></v-spacer>
+                                                        <v-btn
+                                                        color="blue darken-1"
+                                                        text
+                                                        @click="dialog = false"
+                                                        >
+                                                        Close
+                                                        </v-btn>
+                                                        <v-btn
+                                                        color="blue darken-1"
+                                                        text
+                                                        @click="dialog = false"
+                                                        >
+                                                        Save
+                                                        </v-btn>
+                                                    </v-card-actions>
+                                                    <!--<v-card-actions
+                                                    link
+                                                    >
+                                                        <v-list-item-title>デフォルト画像に戻す</v-list-item-title>
+                                                    </v-card-actions>-->
+                                            </v-card>
+                                        </v-dialog>
 
-                                        <v-form
+                                        <!--<v-form
                                             ref="form"
                                             v-model="isValid"
                                             @submit.prevent="adminAvatar"
-                                        >
+                                        >-->
                                             <!--<v-badge
                                                 bordered
                                                 bottom
@@ -51,7 +115,7 @@
                                                 offset-x="30"
                                                 offset-y="30"
                                             >-->
-                                                    <v-file-input
+                                                    <!--<v-file-input
                                                         v-model="avatarFilename"
                                                         accept="image/*"
                                                         filled
@@ -61,29 +125,28 @@
                                                         color="deep-purple"
                                                         @change="adminAvatar"
                                                         name="file"
-                                                    ></v-file-input>
+                                                    ></v-file-input>-->
                                             <!--</v-badge>-->
                                             [{{avatarFilename}}]
-                                        </v-form>
+                                        <!--</v-form>-->
                                         <v-card>
                                             <v-card-title>ユーザー情報の変更</v-card-title>
                                             <v-card-subtitle>プロフィール情報を更新する場合はこちらから変更してください。</v-card-subtitle>
                                             <v-card-text>
-                                                <v-form ref="form">
-                                                    <v-text-field
-                                                        v-model="name"
-                                                        :counter="10"
-                                                        :rules="nameRules"
-                                                        label="ユーザー名"
-                                                        outlined
-                                                    ></v-text-field>
-                                                
-                                                    <v-text-field
-                                                        v-model="email"
-                                                        :rules="emailRules"
-                                                        label="メールアドレス"
-                                                        outlined
-                                                    ></v-text-field>
+                                                <v-form 
+                                                    ref="form"
+                                                    v-model="isValid"
+                                                    @submit.prevent="profileUpdate"    
+                                                >
+ 
+                                                    <UserFormName
+                                                        :name.sync="params.user.name"
+                                                    />    
+                                                    
+                                                    <UserFormEmail
+                                                        :email.sync="params.user.email"
+                                                    />
+
                                                     プライバシー設定
                                                     <v-checkbox v-model="checkbox">
                                                         <template v-slot:label>
@@ -126,8 +189,10 @@
                                             </v-card-subtitle>
                                             <v-card-text>
                                                 <v-form ref="form">
+
+                                                    <!--
                                                     <v-text-field
-                                                        v-model="password"
+                                                        v-model="currentPassword"
                                                         label="現在のパスワード"
                                                         outlined
                                                     ></v-text-field>
@@ -136,11 +201,29 @@
                                                         label="新しいパスワード"
                                                         outlined
                                                     ></v-text-field>
+                                                    
                                                     <v-text-field
                                                         v-model="passwordConfirm"
                                                         label="新しいパスワードの確認"
                                                         outlined
-                                                    ></v-text-field>
+                                                    ></v-text-field>                                                     
+                                                    -->
+
+                                                    <UserFormPassword
+                                                        :password.sync="params.user.password"
+                                                        set-validation
+                                                    />
+
+                                                    <UserFormPassword
+                                                        :password.sync="password.new"
+                                                        set-validation
+                                                    />
+
+                                                    <UserFormPassword
+                                                        :password.sync="password.confirm"
+                                                        set-validation
+                                                    />
+
                                                 </v-form>
                                             </v-card-text>
                                             <v-card-actions class="pr-4 pl-4 pb-4">
@@ -211,13 +294,25 @@ export default Vue.extend({
                 value: 'datetime'
             }
       ],
+      params: {
+        user: {
+            name: '',
+            email: '',
+            password: ''
+        }
+      },
+      password: {
+          new: '',
+          confirm: '',
+      },
       logs: [
           {id: 1, filename: "Sample01.jpg", datetime: "2021/12/27 18:30"},
           {id: 2, filename: "Sample02.png", datetime: "2021/12/27 18:35"},
           {id: 3, filename: "Sample03.jpg", datetime: "2021/12/27 18:37"},
           {id: 4, filename: "Sample04.gif", datetime: "2021/12/27 18:38"},
           {id: 5, filename: "Sample05.jpg", datetime: "2021/12/28 18:39"}, 
-      ]
+      ],
+      dialog: false,
     }
   },
   methods: {
@@ -236,5 +331,10 @@ export default Vue.extend({
   }
 })
 </script>
-<style>
+<style lang="scss">
+.cameraIcon-position {
+    bottom: 50px;
+    left: 50px;
+    border: 2px solid #fff
+}
 </style>
