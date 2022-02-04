@@ -1,7 +1,17 @@
 <template>
     <v-app id="inspire">
         <v-sheet>
-            <Header />
+            <Header
+                #navigation-toggle-button
+                clipped-left
+                >
+                    <v-app-bar-nav-icon
+                    @click="drawer = !drawer"
+                    />
+                </Header>
+                <NavigationDrawer
+                :drawer.sync="drawer"
+            />
             <v-main>
                 <v-container align="center">
                     <v-tabs vertical>
@@ -23,25 +33,24 @@
                                         <v-avatar size="100">
                                             <v-icon 
                                                 size="100"
-                                                v-if="!avatarFilename"
+                                                v-if="!avatarBinaryFile"
                                             >
                                                 mdi-account-circle
                                             </v-icon>
-
                                             <v-img
                                                 :aspect-ratio="16/9"
                                                 width="100"
-                                                :src="avatarFilename"
+                                                :src="avatarBinaryFile"
                                                 contain
-                                                v-if="avatarFilename"
-                                            ></v-img>           
+                                                v-if="avatarBinaryFile"
+                                            ></v-img>        
                                         </v-avatar>
                                         <v-dialog
                                             v-model="dialog"
-                                            width="300px"
+                                            width="300"
                                             dense
                                         >
-                                            <template v-slot:activator="{ on, attrs}">
+                                            <template v-slot:activator="{ on, attrs }">
                                                 <v-btn
                                                     fab
                                                     x-small
@@ -69,36 +78,33 @@
                                                             hide-details
                                                             dense
                                                             class="pt-2 pb-2"
+                                                            v-model="avatarFilename"
+                                                            @change="inputAvatarImage"
                                                         ></v-file-input>
                                                     </v-card-actions>
                                                     <v-divider />
                                                     <v-card-actions
                                                     >
-                                                        <v-btn text>デフォルト画像を表示</v-btn>
+                                                    <v-btn @click="resetForm" text>デフォルト画像を表示</v-btn>
                                                     </v-card-actions>
                                                     <v-divider />
                                                     <v-card-actions>
                                                         <v-spacer></v-spacer>
                                                         <v-btn
-                                                        color="blue darken-1"
-                                                        text
-                                                        @click="dialog = false"
+                                                            color="blue darken-1"
+                                                            text
+                                                            @click="dialogCancel"
                                                         >
-                                                        Close
+                                                        Cancel
                                                         </v-btn>
                                                         <v-btn
-                                                        color="blue darken-1"
-                                                        text
-                                                        @click="dialog = false"
+                                                            color="blue darken-1"
+                                                            text
+                                                            @click="dialog = false"
                                                         >
                                                         Save
                                                         </v-btn>
                                                     </v-card-actions>
-                                                    <!--<v-card-actions
-                                                    link
-                                                    >
-                                                        <v-list-item-title>デフォルト画像に戻す</v-list-item-title>
-                                                    </v-card-actions>-->
                                             </v-card>
                                         </v-dialog>
 
@@ -128,7 +134,6 @@
                                                         name="file"
                                                     ></v-file-input>-->
                                             <!--</v-badge>-->
-                                            [{{avatarFilename}}]
                                         <!--</v-form>-->
                                         <v-card>
                                             <v-card-title>ユーザー情報の変更</v-card-title>
@@ -284,7 +289,7 @@ export default Vue.extend({
     return {
       isValid: false,
       checkbox: false,
-      avatarFilename: '',
+      avatarFilename: [],
       headers: [
             {
                text: '更新したファイル名',
@@ -314,11 +319,40 @@ export default Vue.extend({
           {id: 5, filename: "Sample05.jpg", datetime: "2021/12/28 18:39"}, 
       ],
       dialog: false,
+      avatarBinaryFile: '',
+      drawer: false,
     }
   },
   methods: {
-      adminAvatar() {
-            if (this.avatarFilename) {
+        //アバター画像を選択した際に実行される
+        inputAvatarImage(event: any): void {
+            if (event) {
+                const inputImage = event;
+                const reader = new FileReader();
+                reader.readAsDataURL(inputImage);
+                reader.onload = (e) => {
+                    if (e.target) {
+                        const csv: string = e.target.result as string;
+                        if (typeof csv == 'string') {
+                            this.avatarBinaryFile = csv;
+                        } else {
+                            this.avatarBinaryFile = Buffer.from(csv).toString();
+                        }
+                    }
+                }
+                reader.onerror = (e) => {
+                    alert('読み取り時にエラーが発生しました');
+                }
+            }
+        },
+        //デフォルト画像に戻す
+        changeDefaultAvatar(): void {
+            //this.avatarBinaryFile = '';
+            //this.avatarFilename = '';
+            this.resetForm();
+        },
+        adminAvatar(): void {
+            /*if (this.avatarFilename) {
                 const formData = new FormData();
                 formData.append('file', this.avatarFilename);
                 axios.post('http://localhost:3010/avatarUpload', formData)
@@ -327,9 +361,23 @@ export default Vue.extend({
                 }).catch(error => {
                     console.log({error});
                 })
+            }*/
+        },
+        //ダイアログ表示中にキャンセルボタンが実行された
+        dialogCancel(): void {
+            this.dialog = false;
+            this.resetForm();
+        },
+        //入力値の初期化
+        resetForm() {
+            if (this.avatarBinaryFile) {
+                this.avatarBinaryFile = '';
             }
-      }
-  }
+            if (this.avatarFilename) {
+                this.avatarFilename = [];
+            }
+        }
+    }
 })
 </script>
 <style lang="scss">
