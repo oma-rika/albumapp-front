@@ -3,9 +3,11 @@
       app
       dark
       dense
-      clipped-left="1"
+      elevation="1"
+      :clipped-left="clippedLeft"
     >
-      <v-app-bar-nav-icon />
+      <slot name="navigation-toggle-button" />
+      <!--<v-app-bar-nav-icon />-->
       <v-toolbar-title>Page title</v-toolbar-title>
 
       <v-spacer />
@@ -51,7 +53,10 @@
 import Vue from 'vue'
 export default Vue.extend({
   props: {
-      
+      clippedLeft: {
+        type: Boolean,
+        default: false
+      }
   },
   data() {
     return {
