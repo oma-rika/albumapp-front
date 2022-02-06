@@ -68,6 +68,11 @@
                                                 </v-btn>
                                             </template>
                                             <v-card>
+                                                <v-form
+                                                    ref="form"
+                                                    @submit.prevent="adminAvatar"
+                                                    enctype="multipart/form-data"
+                                                >
                                                     <v-card-actions
                                                     >
                                                         <v-file-input
@@ -78,7 +83,7 @@
                                                             hide-details
                                                             dense
                                                             class="pt-2 pb-2"
-                                                            v-model="avatarFilename"
+                                                            name="filename"
                                                             @change="inputAvatarImage"
                                                         ></v-file-input>
                                                     </v-card-actions>
@@ -100,11 +105,13 @@
                                                         <v-btn
                                                             color="blue darken-1"
                                                             text
-                                                            @click="dialog = false"
+                                                            type="submit"
+                                                            :disabled="!avatarFilename"
                                                         >
                                                         Save
                                                         </v-btn>
                                                     </v-card-actions>
+                                                </v-form>
                                             </v-card>
                                         </v-dialog>
 
@@ -289,7 +296,7 @@ export default Vue.extend({
     return {
       isValid: false,
       checkbox: false,
-      avatarFilename: [],
+      avatarFilename: '',
       headers: [
             {
                text: '更新したファイル名',
@@ -327,7 +334,10 @@ export default Vue.extend({
         //アバター画像を選択した際に実行される
         inputAvatarImage(event: any): void {
             if (event) {
+                console.log('event:', event);
                 const inputImage = event;
+                //POSTする際にも使用
+                this.avatarFilename = event;
                 const reader = new FileReader();
                 reader.readAsDataURL(inputImage);
                 reader.onload = (e) => {
@@ -351,8 +361,11 @@ export default Vue.extend({
             //this.avatarFilename = '';
             this.resetForm();
         },
-        adminAvatar(): void {
-            /*if (this.avatarFilename) {
+        adminAvatar(e:any): void {
+            console.log('フォームを送信');
+            if (this.avatarFilename) {
+                console.log('this.avatarFilename', this.avatarFilename);
+                console.log('this->e:', e);
                 const formData = new FormData();
                 formData.append('file', this.avatarFilename);
                 axios.post('http://localhost:3010/avatarUpload', formData)
@@ -361,7 +374,8 @@ export default Vue.extend({
                 }).catch(error => {
                     console.log({error});
                 })
-            }*/
+            }
+            this.dialog = false;
         },
         //ダイアログ表示中にキャンセルボタンが実行された
         dialogCancel(): void {
@@ -372,9 +386,6 @@ export default Vue.extend({
         resetForm() {
             if (this.avatarBinaryFile) {
                 this.avatarBinaryFile = '';
-            }
-            if (this.avatarFilename) {
-                this.avatarFilename = [];
             }
         }
     }
