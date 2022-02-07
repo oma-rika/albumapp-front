@@ -292,6 +292,7 @@ import Vue from 'vue'
 import axios from 'axios'
 
 export default Vue.extend({
+　middleware: 'authenticated',
   data() {
     return {
       isValid: false,
@@ -363,12 +364,14 @@ export default Vue.extend({
         },
         adminAvatar(e:any): void {
             console.log('フォームを送信');
+            const userId = this.$store.getters.getCurrentUserId;
+            console.log('userId:', userId);
             if (this.avatarFilename) {
                 console.log('this.avatarFilename', this.avatarFilename);
                 console.log('this->e:', e);
                 const formData = new FormData();
                 formData.append('file', this.avatarFilename);
-                axios.post('http://localhost:3010/avatarUpload', formData)
+                axios.post(`http://localhost:3010/avatarUpload/${userId}`, formData)
                 .then(response => {
                     console.log({response});
                 }).catch(error => {
