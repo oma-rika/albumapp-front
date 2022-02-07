@@ -32,7 +32,8 @@ const app = express();
 // start();
 
 
-
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
 const cors    = require('cors');
 app.use(cors());
 const uuid = require('uuid');
@@ -43,7 +44,6 @@ const session = require('express-session');
 const multer = require('multer');
 const path = require('path');
 
-
 let storage = multer.diskStorage({
     destination: (req, file, cb) => {
         let destination = path.join(__dirname, '../updir'); // ./updir/
@@ -51,7 +51,7 @@ let storage = multer.diskStorage({
         if (req.session && req.session.userId) {
             destination = path.join(destination, 'users', req.session.userId, uuid()); // ./up/users/1/generated-uuid/
         } else {
-            destination = path.join(destination, 'images'); // ./updir/tmp
+            destination = path.join(destination, 'images'); // ./updir/images
         }
         
         cb(null, destination);
@@ -69,14 +69,38 @@ const connection = mysql.createConnection({
     password: '*****',　//2021-11-18 PassWordChange
 });
 
-//express-sessionを使うために必要な情報を張り付ける
+//express-sessionを使うために必要な情報
+app.set('trust proxy', 1);
 app.use(
     session({
         secret: 'my_secret_key',
         resave: false,
         saveUninitialized: false,
+        cookie: {
+            //path: '/',
+            domain: 'localhost',
+            //sameSite: true,
+            httpOnly: true,
+            secure: false, //開発環境ではfalseにする
+            maxAge: 60 * 1000 * 30
+        }
     })
 );
+
+
+// if (app.get('env') === 'production') {
+//     app.set('trust proxy', 1) // trust first proxy
+//     sess.cookie.secure = true // serve secure cookies
+//   }
+
+// app.use(
+//     cookieSession({
+//         name: "session",
+//         keys: ["key1", "key2"],
+//         maxAge: 60 * 1000 * 30
+//     })   
+// )
+
 
 app.use((req, res, next) => {
     if (req.session.userId == undefined) {
@@ -92,6 +116,11 @@ connection.connect((err) => {
     if (err) throw err;
     console.log('connected to mysql');
 });
+
+app.get('/api', (req, res) => {
+    res.setHeader('Set-Cookie', 'My seacret token');
+    res.end('Hello world');
+})
 
 // app.get('/api',   (req, res) => {
 //     //res.status(200).send('app gets!!!');
@@ -148,7 +177,7 @@ app.post('/login', cors(), (req, res) => {
                 console.log('該当するユーザーがいました');
                 if (req.body.passWord === results[0].Password) {
                     req.session.userId = results[0].ID;
-                    console.log('req.session.userId:', req.session.userId);
+                    req.session.save();
                 } else {
                     console.log('パスワードが一致しない');
                 }
@@ -162,7 +191,6 @@ app.post('/login', cors(), (req, res) => {
             //res.status(200).json({status: resMessage, items: results});
         }
     );
-    //connection.end();
 });
 
 app.get('/albums/:userId/:limit', cors(), (req, res) => {
@@ -248,13 +276,30 @@ app.post('/fileUpload', cors(), (req, res) => {
     //connection.end();
 });
 
-//app.post('/avatarUpload', multer({ dest: 'updir/' }).single('file'), (req, res) => {
-//    console.log('req.file', req.file);
+// app.post('/avatarUpload', multer({ dest: 'updir/' }).single('file'), (req, res) => {
+//    console.log('req.file:', req.file.filename);
 //    res.status(200).send('ファイルのアップロードが完了しました。');
-//});
+// });
 
-app.post('/avatarUpload', multer({ storage: storage }).single('file'), (req, res) => {
-   res.status(200).send('ファイルのアップロードが完了しました。');
+app.post('/avatarUpload/:userId', multer({ storage: storage }).single('file'), (req, res) => {
+    const userId = req.params.userId;
+    console.log(req.file.filename, ':filename');
+    console.log(req.file, ':file');
+    console.log('userId', userId);
+    
+    let reqFilepath = req.file.path;
+    let filepath = reqFilepath.substr(reqFilepath.indexOf('updir'));
+    console.log('filepath:', filepath);
+   
+    let sql = 'UPDATE albumapp.user SET AvatarFilePath=? WHERE ID = ?';
+    connection.query(
+        sql,
+        [filepath, userId],
+        (error, resuls) => {
+            if (error) throw error;
+            res.status(200).send('ファイルのアップロードが完了しました。');
+        }
+    )
 });
 
 
