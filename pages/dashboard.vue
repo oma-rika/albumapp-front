@@ -57,102 +57,44 @@
                     justify="center"
                 >
                     <v-col 
+                        :key="i"
                         cols="12"
                         class="d-flex justify-space-between mb-10"
                     >
-                        <v-hover v-slot="{ hover }">
-                            <v-card
-                            max-width="350"
-                            outlined
-                            :elevation="hover ? 12 : 2"
-                            >
-                                <v-list-item>
-                                    <v-list-item-avatar
-                                        title
-                                        size="80"
-                                        color="grey"
-                                    >
-                                    </v-list-item-avatar>
-                                    <v-list-item-content>
-                                        <v-list-title
-                                            class="text-h5 mb-1"
+                        <template v-for="(menu, i) in menuList">
+                            <v-hover v-slot="{ hover }">
+                                <v-card
+                                    max-width="350"
+                                    outlined
+                                    :elevation="hover ? 12 : 2"
+                                    :class="{ 'on-hover': hover }"
+                                >
+                                    <v-list-item>
+                                        <v-list-item-avatar
+                                            title
+                                            size="80"
+                                            color="grey"
                                         >
-                                            <nuxt-link 
-                                                to="project/2"
-                                                class="body-2 text-decoration-none"
+                                        </v-list-item-avatar>
+                                        <v-list-item-content>
+                                            <v-list-title
+                                                class="text-h5 mb-1"
                                             >
-                                                アルバムを表示
-                                            </nuxt-link>
-                                        </v-list-title>
-                                        <v-list-subtitle>
-                                            投稿したものを一覧表示する。
-                                        </v-list-subtitle>
-                                    </v-list-item-content>
-                                </v-list-item>
-                            </v-card>
-                        </v-hover>
-                        <v-hover v-slot="{ hover }">
-                            <v-card
-                            max-width="350"
-                            outlined
-                            :elevation="hover ? 12 : 2"
-                            >
-                                <v-list-item>
-                                    <v-list-item-avatar
-                                        title
-                                        size="80"
-                                        color="grey"
-                                    >
-                                    </v-list-item-avatar>
-                                    <v-list-item-content>
-                                        <v-list-title
-                                            class="text-h5 mb-1"
-                                        >
-                                            <nuxt-link 
-                                                to="project/2"
-                                                class="body-2 text-decoration-none"
-                                            >
-                                                お気に入りを表示
-                                            </nuxt-link>
-                                        </v-list-title>
-                                        <v-list-subtitle>
-                                            お気に入り登録したものを一覧表示する。
-                                        </v-list-subtitle>
-                                    </v-list-item-content>
-                                </v-list-item>
-                            </v-card>
-                        </v-hover>
-                        <v-hover v-slot="{ hover }">
-                            <v-card
-                            max-width="350"
-                            outlined
-                            :elevation="hover ? 12 : 2"
-                            >
-                                <v-list-item>
-                                    <v-list-item-avatar
-                                        title
-                                        size="80"
-                                        color="grey"
-                                    >
-                                    </v-list-item-avatar>
-                                    <v-list-item-content>
-                                        <v-list-title
-                                            class="text-h5 mb-1"
-                                        >
-                                            <nuxt-link 
-                                                to="project/2"
-                                                class="body-2 text-decoration-none"
-                                            >
-                                                共有フォルダを表示
-                                            </nuxt-link>
-                                        </v-list-title>
-                                        <v-list-subtitle>
-                                            共有したものを一覧表示する。
-                                        </v-list-subtitle>
-                                    </v-list-item-content>
-                                </v-list-item>
-                            </v-card>
-                        </v-hover>
+                                                <nuxt-link 
+                                                    to="project/2"
+                                                    class="body-2 text-decoration-none"
+                                                >
+                                                    {{ menu.title }}
+                                                </nuxt-link>
+                                            </v-list-title>
+                                            <v-list-subtitle>
+                                                {{ menu.text }}
+                                            </v-list-subtitle>
+                                        </v-list-item-content>
+                                    </v-list-item>
+                                </v-card>
+                            </v-hover>
+                        </template>
                     </v-col>
                 </v-row>
                 <h2 class="mb-5">サービス一覧</h2>
@@ -164,99 +106,40 @@
                         cols="12"
                         class="d-flex justify-space-between"
                     >
-                        <v-hover v-slot="{ hover }">
-                            <v-card
-                            max-width="350"
-                            outlined
-                            :elevation="hover ? 12 : 2"
-                            >
-                                <v-list-item>
-                                    <v-list-item-avatar
-                                        title
-                                        size="80"
-                                        color="grey"
-                                    >
-                                    </v-list-item-avatar>
-                                    <v-list-item-content>
-                                        <v-list-title
-                                            class="text-h5 mb-1"
+                        <template v-for="(service, i) in serviceList">
+                            <v-hover v-slot="{ hover }">
+                                <v-card
+                                    max-width="350"
+                                    outlined
+                                    :elevation="hover ? 12 : 2"
+                                    :class="{ 'on-hover': hover }"
+                                >
+                                    <v-list-item>
+                                        <v-list-item-avatar
+                                            title
+                                            size="80"
+                                            color="grey"
                                         >
-                                            <nuxt-link 
-                                                to="project/2"
-                                                class="body-2 text-decoration-none"
+                                        </v-list-item-avatar>
+                                        <v-list-item-content>
+                                            <v-list-title
+                                                class="text-h5 mb-1"
                                             >
-                                                アップロード画面に移動
-                                            </nuxt-link>
-                                        </v-list-title>
-                                        <v-list-subtitle>
-                                            デスクトップにあるデータを選択して投稿する。
-                                        </v-list-subtitle>
-                                    </v-list-item-content>
-                                </v-list-item>
-                            </v-card>
-                        </v-hover>
-                        <v-hover v-slot="{ hover }">
-                            <v-card
-                            max-width="350"
-                            outlined
-                            :elevation="hover ? 12 : 2"
-                            >
-                                <v-list-item>
-                                    <v-list-item-avatar
-                                        title
-                                        size="80"
-                                        color="grey"
-                                    >
-                                    </v-list-item-avatar>
-                                    <v-list-item-content>
-                                        <v-list-title
-                                            class="text-h5 mb-1"
-                                        >
-                                            <nuxt-link 
-                                                to="project/2"
-                                                class="body-2 text-decoration-none"
-                                            >
-                                                共有フォルダを作成
-                                            </nuxt-link>
-                                        </v-list-title>
-                                        <v-list-subtitle>
-                                            共有フォルダを作成して共有したい相手を選択する。
-                                        </v-list-subtitle>
-                                    </v-list-item-content>
-                                </v-list-item>
-                            </v-card>
-                        </v-hover>
-                        <v-hover v-slot="{ hover }">
-                            <v-card
-                            max-width="350"
-                            outlined
-                            :elevation="hover ? 12 : 2"
-                            >
-                                <v-list-item>
-                                    <v-list-item-avatar
-                                        title
-                                        size="80"
-                                        color="grey"
-                                    >
-                                    </v-list-item-avatar>
-                                    <v-list-item-content>
-                                        <v-list-title
-                                            class="text-h5 mb-1"
-                                        >
-                                            <nuxt-link 
-                                                to="project/2"
-                                                class="body-2 text-decoration-none"
-                                            >
-                                                編集画面に移動
-                                            </nuxt-link>
-                                        </v-list-title>
-                                        <v-list-subtitle>
-                                            投稿したデータを削除したり更新できる。
-                                        </v-list-subtitle>
-                                    </v-list-item-content>
-                                </v-list-item>
-                            </v-card>
-                        </v-hover>
+                                                <nuxt-link 
+                                                    to="project/2"
+                                                    class="body-2 text-decoration-none"
+                                                >
+                                                    {{ service.title }}
+                                                </nuxt-link>
+                                            </v-list-title>
+                                            <v-list-subtitle>
+                                                {{ service.text }}
+                                            </v-list-subtitle>
+                                        </v-list-item-content>
+                                    </v-list-item>
+                                </v-card>
+                            </v-hover>
+                        </template>
                     </v-col>
                 </v-row>
             </v-container>
@@ -280,9 +163,40 @@ export default Vue.extend({
                 { title: 'Album', icon: 'mdi-image'},
                 { title: 'Favorite', icon: 'mdi-heart'},
                 { title: 'Group', icon: 'mdi-account-multiple-plus'}
+            ],
+            menuList: [
+                {
+                    title: 'アルバムを表示',
+                    text: '投稿したものを一覧表示する。',
+                    link: '#'
+                },
+                {
+                    title: 'お気に入りを表示',
+                    text: 'お気に入り登録したものを一覧表示する。',
+                    link: '#'                   
+                },
+                {
+                    title: '共有フォルダを表示',
+                    text: '共有したものを一覧表示する。',
+                    link: '#'
+                }
+            ],
+            serviceList: [
+                {
+                    title: 'アップロード画面に移動',
+                    text: 'デスクトップにあるデータを選択して投稿する。',
+                },
+                {
+                    title: '共有フォルダを作成',
+                    text: '共有フォルダを作成して共有したい相手を選択する。'
+                },
+                {
+                    title: '編集画面に移動',
+                    text: '投稿したデータを削除したり更新できる。'
+                }
             ]
         }
     }
 })
-
+//serviceList[0].link = 'aaa';
 </script>
