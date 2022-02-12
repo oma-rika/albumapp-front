@@ -1,7 +1,9 @@
 <template>
     <v-app-bar app dark dense>
         <v-app-bar-nav-icon />
-        <v-toolbar-title>Page title</v-toolbar-title>
+        <v-toolbar-title>
+          <HeaderTitle />
+        </v-toolbar-title>
         <v-spacer />
         <v-btn text>
             言語
@@ -9,9 +11,9 @@
         <v-btn text to="/signin">
             ログイン
         </v-btn>
-        <v-btn 
+        <v-btn
             class="ma-2"
-            outlined 
+            outlined
             color="white"
             to="/signup"
             >
@@ -22,9 +24,6 @@
 <script lang="ts">
 import Vue from 'vue'
 export default Vue.extend({
-  props: {
-      
-  },
   data() {
     return {
       posts: []

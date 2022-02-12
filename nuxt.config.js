@@ -4,7 +4,7 @@ export default {
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    title: 'albumApp',
+    titleTemplate: `albumApp | %s`,
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
@@ -45,7 +45,6 @@ export default {
     '@nuxtjs/pwa',
     //https://i18n.nuxtjs.org/
     '@nuxtjs/i18n',
-    
   ],
   serverMiddleware: [
     {path: '/api/', handler: '~/server/api.js'}
