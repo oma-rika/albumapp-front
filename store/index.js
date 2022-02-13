@@ -24,7 +24,8 @@ const createStore = () => {
                         {id: 2, name: 'MyProject02', updateAt: '2020-04-01T12:00:00+09:00'},
                         {id: 3, name: 'MyProject03', updateAt: '2020-04-01T12:00:00+09:00'},
                     ]
-                }
+                },
+				sessionUserId: null
             }
         },
         getters: {
@@ -33,6 +34,13 @@ const createStore = () => {
                     return state.user.current.ID;
                 } else {
                     console.log('ユーザーは存在しない');
+                }
+            },
+            getAuthToken: (state, getters) => {
+                if (state.auth.token) {
+                    return state.auth.token;
+                } else {
+                    console.log('tokenが取得できません');
                 }
             }
         },
@@ -60,12 +68,16 @@ const createStore = () => {
             },
             logout(state) {
                 console.log('logoutに遷移');
-                state.token = '';
                 state.loggedIn = false;
                 state.userId = 0;
                 //初期化する
                 state.user = {
                     current: null
+                };
+                state.auth = {
+                    token: null,
+                    expires: 0,
+                    payload: { },
                 };
             },
             //20210107追加
@@ -74,7 +86,9 @@ const createStore = () => {
                 console.log('state.user.current', state.user.current.Account);
             },
             setAuthToken (state, payload) {
-                state.auth.token = payload;
+                console.log('tokenを保存');
+                state.auth.token = payload.Token;
+                console.log('token:', state.auth.token);
             },
             setAuthExpires (state, payload) {
                 state.auth.expires = payload;
@@ -84,6 +98,11 @@ const createStore = () => {
             },
             setCurrentProject (state, payload) {
                 state.project.current = payload;
+            },
+            setAuthSession (state, payload) {
+                console.log('sessionを保存');
+                state.sessionUserId = payload;
+
             }
         },
         // actions: {
@@ -97,6 +116,7 @@ const createStore = () => {
                 console.log('payload:', payload);
                 //context.commit('updateMessage', payload);
                 context.commit('setCurrentUser', payload);
+                context.commit('setAuthToken', payload);
                 context.commit('login');
             },
             //20210105追加
@@ -126,6 +146,12 @@ const createStore = () => {
                 console.log('getLoginに遷移');
                 context.commit('login');
             }
+            // nextServerInit({commit}, { req }) {
+            //     if (req.session && req.session.userId) {
+            //         commit('setAuthSession', req.session.userId);
+            //     }
+            // }
+
         },
         plugins: [createPersistedState({storage: window.sessionStorage})]
     })

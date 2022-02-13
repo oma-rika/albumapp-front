@@ -105,7 +105,7 @@ export default Vue.extend({
                 }).then((response) => {
                     this.authSuccessful(response);
                 }).catch(error => {
-                    this.authFailure(error)                   
+                    this.authFailure(error);
                 })
             }
             setTimeout(() => {
@@ -125,7 +125,7 @@ export default Vue.extend({
                     this.$store.dispatch("updateMessageAction", response.data.items[0]);
                     //this.auth = response.data.items[0];
                     //成功したらリダイレクト
-                    this.$router.push('project');
+                    this.$router.push('dashboard');
                     break;
                 default:
                     console.log('notAccount');

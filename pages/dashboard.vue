@@ -56,18 +56,20 @@
                     align="center"
                     justify="center"
                 >
-                    <v-col 
-                        :key="i"
+                    <v-col
                         cols="12"
                         class="d-flex justify-space-between mb-10"
                     >
-                        <template v-for="(menu, i) in menuList">
+                        <template
+                            v-for="(menu, i) in menuList"
+                        >
                             <v-hover v-slot="{ hover }">
                                 <v-card
                                     max-width="350"
                                     outlined
                                     :elevation="hover ? 12 : 2"
                                     :class="{ 'on-hover': hover }"
+                                    :key="i"
                                 >
                                     <v-list-item>
                                         <v-list-item-avatar
@@ -77,19 +79,19 @@
                                         >
                                         </v-list-item-avatar>
                                         <v-list-item-content>
-                                            <v-list-title
+                                            <v-list-item-title
                                                 class="text-h5 mb-1"
                                             >
-                                                <nuxt-link 
+                                                <nuxt-link
                                                     to="project/2"
                                                     class="body-2 text-decoration-none"
                                                 >
                                                     {{ menu.title }}
                                                 </nuxt-link>
-                                            </v-list-title>
-                                            <v-list-subtitle>
+                                            </v-list-item-title>
+                                            <v-list-item-subtitle>
                                                 {{ menu.text }}
-                                            </v-list-subtitle>
+                                            </v-list-item-subtitle>
                                         </v-list-item-content>
                                     </v-list-item>
                                 </v-card>
@@ -102,7 +104,7 @@
                     align="center"
                     justify="center"
                 >
-                    <v-col 
+                    <v-col
                         cols="12"
                         class="d-flex justify-space-between"
                     >
@@ -113,6 +115,7 @@
                                     outlined
                                     :elevation="hover ? 12 : 2"
                                     :class="{ 'on-hover': hover }"
+                                    :key="i"
                                 >
                                     <v-list-item>
                                         <v-list-item-avatar
@@ -122,19 +125,19 @@
                                         >
                                         </v-list-item-avatar>
                                         <v-list-item-content>
-                                            <v-list-title
+                                            <v-list-item-title
                                                 class="text-h5 mb-1"
                                             >
-                                                <nuxt-link 
+                                                <nuxt-link
                                                     to="project/2"
                                                     class="body-2 text-decoration-none"
                                                 >
                                                     {{ service.title }}
                                                 </nuxt-link>
-                                            </v-list-title>
-                                            <v-list-subtitle>
+                                            </v-list-item-title>
+                                            <v-list-item-subtitle>
                                                 {{ service.text }}
-                                            </v-list-subtitle>
+                                            </v-list-item-subtitle>
                                         </v-list-item-content>
                                     </v-list-item>
                                 </v-card>
@@ -144,6 +147,7 @@
                 </v-row>
             </v-container>
             <nuxt-link to="project/2">アルバム</nuxt-link>
+            <v-btn @click="Test">テストボタン</v-btn>
         </v-main>
         <Footer />
     </v-app>
@@ -173,7 +177,7 @@ export default Vue.extend({
                 {
                     title: 'お気に入りを表示',
                     text: 'お気に入り登録したものを一覧表示する。',
-                    link: '#'                   
+                    link: '#'
                 },
                 {
                     title: '共有フォルダを表示',
@@ -196,6 +200,22 @@ export default Vue.extend({
                 }
             ]
         }
+    },
+    methods: {
+        async Test() {
+            const authToken = this.$store.getters.getAuthToken;
+            await axios.get('http://localhost:3010/api', {
+                headers: {
+                    Authorization:  `token ${authToken}`
+                }
+            }
+            ).then((response) => {
+                console.log('アクセス成功');
+                console.log(response);
+            }).catch(error => {
+                console.log('error');
+            })
+        },
     }
 })
 //serviceList[0].link = 'aaa';

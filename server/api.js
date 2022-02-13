@@ -32,8 +32,8 @@ const app = express();
 // start();
 
 
-const cookieParser = require('cookie-parser');
-app.use(cookieParser());
+// const cookieParser = require('cookie-parser');
+// app.use(cookieParser());
 const cors    = require('cors');
 app.use(cors());
 const uuid = require('uuid');
@@ -43,6 +43,7 @@ const mysql = require('mysql');
 const session = require('express-session');
 const multer = require('multer');
 const path = require('path');
+const jwt = require('jsonwebtoken')
 
 let storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -53,7 +54,6 @@ let storage = multer.diskStorage({
         } else {
             destination = path.join(destination, 'images'); // ./updir/images
         }
-        
         cb(null, destination);
     },
     filename: function (req, file, cb) {
@@ -69,17 +69,14 @@ const connection = mysql.createConnection({
     password: '*****',　//2021-11-18 PassWordChange
 });
 
-//express-sessionを使うために必要な情報
-app.set('trust proxy', 1);
+//express-session
 app.use(
     session({
         secret: 'my_secret_key',
         resave: false,
         saveUninitialized: false,
         cookie: {
-            //path: '/',
             domain: 'localhost',
-            //sameSite: true,
             httpOnly: true,
             secure: false, //開発環境ではfalseにする
             maxAge: 60 * 1000 * 30
@@ -98,7 +95,7 @@ app.use(
 //         name: "session",
 //         keys: ["key1", "key2"],
 //         maxAge: 60 * 1000 * 30
-//     })   
+//     })
 // )
 
 
@@ -118,8 +115,22 @@ connection.connect((err) => {
 });
 
 app.get('/api', (req, res) => {
-    res.setHeader('Set-Cookie', 'My seacret token');
-    res.end('Hello world');
+    //ブラウザが送られてくるTokenのチェック
+    //console.log('req.headers:', req.headers);
+    if (req.headers) {
+        const bearToken = req.headers['authorization'];
+        const bearer = bearToken.split(' ');
+        console.log('bearere');
+        const token = bearer[1];
+        jwt.verify(token, 'secret_key', (error, user) => {
+            if (error) {
+                return res.status(403).send('Forbidden');
+            } else {
+                res.setHeader('Set-Cookie', 'My seacret token');
+                res.end('Hello world');
+            }
+        })
+    }
 })
 
 // app.get('/api',   (req, res) => {
@@ -160,24 +171,32 @@ app.get('/api', (req, res) => {
 
 app.post('/login', cors(), (req, res) => {
     console.log('signinアクション');
-    //post値受け取れるか確認
     console.log(req.body.emailAddress);
     console.log(req.body.passWord);
-    // connection.connect((err) => {
-    //     if (err) throw err;
-    //     console.log('connected to mysql');
-    // });
     let resMessage;
     let sql = 'SELECT * FROM albumapp.user WHERE MailAddress = ? AND Password = ?';
     connection.query(
         sql,
         [req.body.emailAddress, req.body.passWord],
         (error, results) => {
+            let token;
             if (results.length > 0) {
                 console.log('該当するユーザーがいました');
                 if (req.body.passWord === results[0].Password) {
                     req.session.userId = results[0].ID;
-                    req.session.save();
+                    const payload = {
+                        id: results[0].ID,
+                        name: results[0].Account,
+                        email: results[0].MailAdress
+
+                    };
+                    token = jwt.sign({
+                        expiresIn: '1d', // Expires after date
+                        payload
+                    }, 'secret_key');
+                    if (token) {
+                        results[0].Token = token;
+                    }
                 } else {
                     console.log('パスワードが一致しない');
                 }
@@ -188,13 +207,28 @@ app.post('/login', cors(), (req, res) => {
                 resMessage = 'NotFound';
                 res.status(404).send({status: resMessage, items: results});
             }
-            //res.status(200).json({status: resMessage, items: results});
+            res.end();
         }
     );
 });
 
 app.get('/albums/:userId/:limit', cors(), (req, res) => {
     console.log('画像一覧を取得');
+    console.log('tokenを確認');
+    if (req.headers) {
+        const bearToken = req.headers['authorization'];
+        const bearer = bearToken.split(' ');
+        console.log('bearere');
+        const token = bearer[1];
+        jwt.verify(token, 'secret_key', (error, user) => {
+            if (error) {
+                return res.status(403).send('Forbidden');
+            } else {
+                res.setHeader('Set-Cookie', 'My seacret token');
+                res.end('Hello world');
+            }
+        })
+    }
     const userId = req.params.userId;
     console.log('userId:', userId);
     const limit = req.params.limit * 10;
@@ -286,11 +320,11 @@ app.post('/avatarUpload/:userId', multer({ storage: storage }).single('file'), (
     console.log(req.file.filename, ':filename');
     console.log(req.file, ':file');
     console.log('userId', userId);
-    
+
     let reqFilepath = req.file.path;
     let filepath = reqFilepath.substr(reqFilepath.indexOf('updir'));
     console.log('filepath:', filepath);
-   
+
     let sql = 'UPDATE albumapp.user SET AvatarFilePath=? WHERE ID = ?';
     connection.query(
         sql,
@@ -301,7 +335,6 @@ app.post('/avatarUpload/:userId', multer({ storage: storage }).single('file'), (
         }
     )
 });
-
 
 app.listen(3010, () => {
     console.log('api');
