@@ -66,7 +66,7 @@ const connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     database: 'albumapp',
-    password: '*****',　//2021-11-18 PassWordChange
+    password: '*****', //2021-11-18 PassWordChange
 });
 
 //express-session
@@ -115,7 +115,7 @@ connection.connect((err) => {
 });
 
 app.get('/api', (req, res) => {
-    //ブラウザが送られてくるTokenのチェック
+    //ブラウザから送られてくるTokenのチェック
     //console.log('req.headers:', req.headers);
     if (req.headers) {
         const bearToken = req.headers['authorization'];
@@ -187,9 +187,11 @@ app.post('/login', cors(), (req, res) => {
                     const payload = {
                         id: results[0].ID,
                         name: results[0].Account,
-                        email: results[0].MailAdress
-
+                        email: results[0].MailAddress,
+                        password: results[0].Password,
+                        NickName: results[0].NickName
                     };
+                    //console.log('payload', payload);
                     token = jwt.sign({
                         expiresIn: '1d', // Expires after date
                         payload
@@ -205,6 +207,7 @@ app.post('/login', cors(), (req, res) => {
             } else {
                 console.log('該当するユーザーはいない');
                 resMessage = 'NotFound';
+                //2022-02-16 itemsのレスポンスは必要か検討
                 res.status(404).send({status: resMessage, items: results});
             }
             res.end();
@@ -214,21 +217,6 @@ app.post('/login', cors(), (req, res) => {
 
 app.get('/albums/:userId/:limit', cors(), (req, res) => {
     console.log('画像一覧を取得');
-    console.log('tokenを確認');
-    if (req.headers) {
-        const bearToken = req.headers['authorization'];
-        const bearer = bearToken.split(' ');
-        console.log('bearere');
-        const token = bearer[1];
-        jwt.verify(token, 'secret_key', (error, user) => {
-            if (error) {
-                return res.status(403).send('Forbidden');
-            } else {
-                res.setHeader('Set-Cookie', 'My seacret token');
-                res.end('Hello world');
-            }
-        })
-    }
     const userId = req.params.userId;
     console.log('userId:', userId);
     const limit = req.params.limit * 10;
@@ -254,20 +242,36 @@ app.get('/albums/:userId/:limit', cors(), (req, res) => {
 
 app.post('/favorite', cors(), (req, res) => {
     console.log('お気に入り登録');
-    //console.log('req.body.id', req.body.id);
-    //console.log('req.body.userId', req.body.userId);
-    //console.log('req.body.favorite', req.body.favorite);
-    let like = req.body.favorite ? 1 : 0;
-    console.log('like', like);
-    let sql = 'UPDATE albumapp.image_db SET favorite=? WHERE id=? AND UserId=?';
-    connection.query(
-        sql,
-        [like, req.body.id, req.body.userId],
-        (error, results) => {
-            if (error) throw error;
-            res.status(200).send('送信完了');
-        }
-    );
+    //console.log('tokenを確認');
+    console.log('req.body.id', req.body.id);
+    if (req.headers) {
+        console.log('req.headers:', req.headers);
+        const bearToken = req.headers['authorization'];
+        console.log('bearToken:', bearToken);
+        const bearer = bearToken.split(' ');
+        console.log('bearere');
+        const token = bearer[1];
+        jwt.verify(token, 'secret_key', (error, user) => {
+            if (error) {
+                return res.status(403).send('Forbidden');
+            } else {
+                console.log('成功');
+                console.log('user:', user);
+                console.log('user.payload.Id:', user.payload.id);
+                let like = req.body.favorite ? 1 : 0;
+                console.log('like', like);
+                let sql = 'UPDATE albumapp.image_db SET favorite=? WHERE id=? AND UserId=?';
+                connection.query(
+                    sql,
+                    [like, req.body.id, user.payload.id],
+                    (error, results) => {
+                        if (error) throw error;
+                        res.status(200).send('送信完了');
+                    }
+                );
+            }
+        })
+    }
 });
 
 app.post('/signup', cors(), (req, res) => {

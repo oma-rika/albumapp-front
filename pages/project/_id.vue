@@ -26,7 +26,7 @@
               </v-col>
             </v-row>
           </v-alert>
-          <v-row 
+          <v-row
               align="center"
               class="pt-10 pb-10"
           >
@@ -50,7 +50,7 @@
                           <v-btn icon>
                               <v-icon
                               @click="addFavorite(card)"
-                              :color="card.favorite ? 'red' : '' " 
+                              :color="card.favorite ? 'red' : '' "
                               >
                                 mdi-heart
                               </v-icon>
@@ -65,7 +65,6 @@
                   </v-card>
               </v-col>
           </v-row>
-          <!-- 追加 -->
         </v-container>
         <Footer />
       </v-main>
@@ -81,19 +80,31 @@ import http from 'http'
 import { Buffer } from 'buffer';
 
 export default Vue.extend({
-  asyncData({$axios, params}) {
-    //const userId = this.$store.getters.getCurrentUserId;
-    console.log('params:', params);
+  middleware: 'authenticated',
+  asyncData({$axios, params, store }) {
+    //const authToken = store.getters.getAuthToken;
+    //console.log('authToken:', authToken);
+    //console.log('params:', params);
     const userId = params.id;
-    console.log('userIdを送信:', userId);
 
-    return $axios.get(`http://localhost:3010/albums/${userId}/1`)  
+    return $axios.get(`http://localhost:3010/albums/${userId}/1`)
     .then(response => {
       return { albums: response.data };
     }).catch(error => {
       console.log('取得前にエラーが発生した');
       error({ statusCode: 404, message: 'ページが見つかりません'})
     });
+    //練習用に残しておく
+    /*return $axios.get(`http://localhost:3010/albums/${userId}/1`, {
+      headers: {
+        Authorization: `token ${authToken}`
+      }
+    }).then(response => {
+      return { albums: response.data };
+    }).catch(error => {
+      console.log('取得前にエラーが発生した');
+      error({ statusCode: 404, message: 'ページが見つかりません'})
+    });*/
   },
   data() {
     return {
@@ -106,24 +117,26 @@ export default Vue.extend({
     base64Decode(Path:Buffer) {
       const bufferToBase64 = Buffer.from(Path).toString('base64');
       const decodeObject = Buffer.from(bufferToBase64, 'base64').toString();
-      console.log('decodeObject:', decodeObject);
+      //console.log('decodeObject:', decodeObject);
       const imagePath = decodeObject;
       return imagePath;
     },
     async addFavorite(card:any) {
-        console.log('card:', card);
-        //console.log('favoriteをクリック:', icon);
         card.favorite = !card.favorite;
         console.log('card.favorite:', card.favorite)
         let p =  {
             id: card.id,
-            userId: this.$store.getters.getCurrentUserId,
             favorite: card.favorite
         };
-        await axios.post('http://localhost:3010/favorite/', p).then(response => {
-          this.addFavoriteSuccessful(response);
+        const authToken = this.$store.getters.getAuthToken;
+        await axios.post('http://localhost:3010/favorite/', p, {
+          headers: {
+              Authorization:  `token ${authToken}`
+          }
+        }).then(response => {
+          (this as any).addFavoriteSuccessful(response);
         }).catch(error => {
-          this.addFavoriteFailure(error);
+          (this as any).addFavoriteFailure(error);
         });
     },
     addFavoriteSuccessful (response:any) {
