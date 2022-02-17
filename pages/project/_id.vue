@@ -30,17 +30,21 @@
               align="center"
               class="pt-10 pb-10"
           >
-            <!--[{{albums}}]-->
               <v-col
                   v-for="card in albums.items"
                   :key="card.id"
-                  :cols="card.flex"
+                  cols="4"
+                  sm="3"
+                  xs="2"
                   v-if="albums.status == 'ok'"
+                  class="d-flex"
               >
-                  <v-card>
+                  <v-card style="flex: 1">
                       <!--[{{base64Decode(card.Path)}}]-->
                       <v-img
                           :src="base64Decode(card.Path)"
+                          aspect-ratio="1.7"
+                          contain
                           height="200px"
                       >
                       </v-img>
