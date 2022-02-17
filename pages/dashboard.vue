@@ -60,20 +60,18 @@
                         align="center"
                     >
                         <v-col
-                            class="mb-md-10 d-flex"
+                            class="mb-md-10"
                             md="4"
                             sm="3"
                             v-for="(menu, i) in menuList"
                             :key="i"
-                            style="flex: 1;"
                         >
                                 <v-hover v-slot="{ hover }">
                                     <v-card
                                         outlined
                                         :elevation="hover ? 12 : 2"
                                         :class="{ 'on-hover': hover }"
-                                        class="justify-space-between align-stretch"
-                                        style="flex-grow: 1"
+                                        class="d-flex justify-space-between align-stretch"
                                     >
                                         <v-list-item>
                                             <v-list-item-icon
@@ -113,7 +111,6 @@
                             md="4"
                             sm="3"
                             class="mb-md-10"
-                            style="flex: 1"
                         >
                             <v-hover v-slot="{ hover }">
                                 <v-card
