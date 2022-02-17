@@ -49,105 +49,110 @@
             <v-toolbar-title>test</v-toolbar-title>
         </v-app-bar>-->
         <v-main>
-            <v-container>
-                <h2>表示画面に移動</h2>
-                <p>this.is dashboard</p>
-                <v-row
-                    align="center"
-                    justify="center"
+            <v-container fluid>
+                <div
+                    style="max-width: 1100px;"
+                    class="mx-auto"
                 >
-                    <v-col
-                        cols="12"
-                        class="d-flex justify-space-between mb-10"
+                    <h2 class="mb-5">ダッシュボード</h2>
+                    <h4 class="mb-5">表示画面に移動</h4>
+                    <v-row
+                        align="center"
                     >
-                        <template
+                        <v-col
+                            class="mb-md-10 d-flex"
+                            md="4"
+                            sm="3"
                             v-for="(menu, i) in menuList"
+                            :key="i"
+                            style="flex: 1;"
+                        >
+                                <v-hover v-slot="{ hover }">
+                                    <v-card
+                                        outlined
+                                        :elevation="hover ? 12 : 2"
+                                        :class="{ 'on-hover': hover }"
+                                        class="justify-space-between align-stretch"
+                                        style="flex-grow: 1"
+                                    >
+                                        <v-list-item>
+                                            <v-list-item-icon
+                                                title
+                                                size="80"
+                                            >
+                                                <v-icon v-text="menu.icon" />
+                                            </v-list-item-icon>
+                                            <v-list-item-content>
+                                                <v-list-item-title
+                                                    class="text-h5 mb-1"
+                                                >
+                                                    <nuxt-link
+                                                        :to="menu.link"
+                                                        class="body-2 text-decoration-none"
+                                                        v-if="menu.link"
+                                                    >
+                                                        {{ menu.title }}
+                                                    </nuxt-link>
+                                                </v-list-item-title>
+                                                <v-list-item-subtitle class="vlist-subtitle">
+                                                    {{ menu.text }}
+                                                </v-list-item-subtitle>
+                                            </v-list-item-content>
+                                        </v-list-item>
+                                    </v-card>
+                                </v-hover>
+                        </v-col>
+                    </v-row>
+                    <h4 class="mt-10 mt-md-0 mb-5">サービス一覧</h4>
+                    <v-row
+                        align="center"
+                        class="mb-sm-15"
+                        v-for="(service, i) in serviceList"
+                    >
+                        <v-col
+                            md="4"
+                            sm="3"
+                            class="mb-md-10"
+                            style="flex: 1"
                         >
                             <v-hover v-slot="{ hover }">
                                 <v-card
-                                    max-width="350"
                                     outlined
                                     :elevation="hover ? 12 : 2"
                                     :class="{ 'on-hover': hover }"
                                     :key="i"
+                                    class="d-flex justify-space-between align-stretch"
                                 >
                                     <v-list-item>
-                                        <v-list-item-avatar
+                                        <v-list-item-icon
                                             title
                                             size="80"
-                                            color="grey"
                                         >
-                                        </v-list-item-avatar>
+                                            <v-icon v-text="service.icon" />
+                                        </v-list-item-icon>
                                         <v-list-item-content>
                                             <v-list-item-title
                                                 class="text-h5 mb-1"
                                             >
                                                 <nuxt-link
-                                                    to="project/2"
-                                                    class="body-2 text-decoration-none"
-                                                >
-                                                    {{ menu.title }}
-                                                </nuxt-link>
-                                            </v-list-item-title>
-                                            <v-list-item-subtitle>
-                                                {{ menu.text }}
-                                            </v-list-item-subtitle>
-                                        </v-list-item-content>
-                                    </v-list-item>
-                                </v-card>
-                            </v-hover>
-                        </template>
-                    </v-col>
-                </v-row>
-                <h2 class="mb-5">サービス一覧</h2>
-                 <v-row
-                    align="center"
-                    justify="center"
-                >
-                    <v-col
-                        cols="12"
-                        class="d-flex justify-space-between"
-                    >
-                        <template v-for="(service, i) in serviceList">
-                            <v-hover v-slot="{ hover }">
-                                <v-card
-                                    max-width="350"
-                                    outlined
-                                    :elevation="hover ? 12 : 2"
-                                    :class="{ 'on-hover': hover }"
-                                    :key="i"
-                                >
-                                    <v-list-item>
-                                        <v-list-item-avatar
-                                            title
-                                            size="80"
-                                            color="grey"
-                                        >
-                                        </v-list-item-avatar>
-                                        <v-list-item-content>
-                                            <v-list-item-title
-                                                class="text-h5 mb-1"
-                                            >
-                                                <nuxt-link
-                                                    to="project/2"
+                                                    :to="service.link"
                                                     class="body-2 text-decoration-none"
                                                 >
                                                     {{ service.title }}
                                                 </nuxt-link>
                                             </v-list-item-title>
-                                            <v-list-item-subtitle>
+                                            <v-list-item-subtitle class="vlist-subtitle">
                                                 {{ service.text }}
                                             </v-list-item-subtitle>
                                         </v-list-item-content>
                                     </v-list-item>
                                 </v-card>
                             </v-hover>
-                        </template>
-                    </v-col>
-                </v-row>
+                        </v-col>
+                    </v-row>
+                </div>
             </v-container>
-            <nuxt-link to="project/2">アルバム</nuxt-link>
-            <v-btn @click="Test">テストボタン</v-btn>
+            <!--<v-btn @click="Test">テストボタン</v-btn>-->
         </v-main>
         <Footer />
     </v-app>
@@ -164,42 +169,49 @@ export default Vue.extend({
             userId: '',
             drawer: false,
             items: [
-                { title: 'Album', icon: 'mdi-image'},
+                { title: 'Album', icon: 'mdi-image-multiple'},
                 { title: 'Favorite', icon: 'mdi-heart'},
-                { title: 'Group', icon: 'mdi-account-multiple-plus'}
+                { title: 'Share', icon: 'mdi-account-multiple-plus'}
             ],
             menuList: [
                 {
                     title: 'アルバムを表示',
                     text: '投稿したものを一覧表示する。',
-                    link: '#'
+                    link: '#',
+                    icon: 'mdi-image-multiple',
                 },
                 {
                     title: 'お気に入りを表示',
-                    text: 'お気に入り登録したものを一覧表示する。',
-                    link: '#'
+                    text: '追加したものを一覧表示する。',
+                    link: '#',
+                    icon: 'mdi-heart'
                 },
                 {
-                    title: '共有フォルダを表示',
+                    title: '共有した画像を表示',
                     text: '共有したものを一覧表示する。',
-                    link: '#'
+                    link: '#',
+                    icon: 'mdi-account-multiple-plus'
                 }
             ],
             serviceList: [
                 {
                     title: 'アップロード画面に移動',
                     text: 'デスクトップにあるデータを選択して投稿する。',
-                },
-                {
-                    title: '共有フォルダを作成',
-                    text: '共有フォルダを作成して共有したい相手を選択する。'
-                },
-                {
-                    title: '編集画面に移動',
-                    text: '投稿したデータを削除したり更新できる。'
+                    link: 'edit',
+                    icon: 'mdi-tray-arrow-up'
                 }
             ]
         }
+    },
+    mounted() {
+        const userId = this.$store.getters.getCurrentUserId;
+        console.log('userId:', userId);
+        if (userId) {
+            this.menuList[0].link = 'project/' + userId;
+            this.menuList[1].link = 'favorite/' + userId;
+            this.menuList[2].link = 'share/' + userId;
+        }
+        console.log('menuList:', this.menuList);
     },
     methods: {
         async Test() {
@@ -220,3 +232,8 @@ export default Vue.extend({
 })
 //serviceList[0].link = 'aaa';
 </script>
+<style lang="scss" scoped>
+.vlist-subtitle {
+    white-space: normal;
+}
+</style>
