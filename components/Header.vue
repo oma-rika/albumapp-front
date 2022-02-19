@@ -25,12 +25,9 @@
           >
             <!--[{{avatarImageData.AvatarFilePath}}]-->
             <v-avatar size="24">
-                <!--<v-icon v-if="!imageSrc">
-                  mdi-account-circle
-                </v-icon>-->
                 <v-img 
-                  v-if="imageSrc"
-                  :src="imageSrc"
+                  v-if="avatarImageData.AvatarFilePath"
+                  :src="`_nuxt/assets/${avatarImageData.AvatarFilePath}`"
                   width="24"
                   contain
                 ></v-img>
@@ -75,7 +72,6 @@ export default Vue.extend({
         }).then((response) => {
           if (response.data.status == 'ok') {
             (this as any).avatarImageData = response.data.items[0];
-            this.getImagePath(this.avatarImageData.AvatarFilePath);
           }          
         }).catch(error => {
             console.log('error');
@@ -95,17 +91,12 @@ export default Vue.extend({
         { text: 'ログアウト', icon: 'mdi-logout-variant', href: ''},
       ],
       avatarImageData: '',
-      imageSrc: '',
     }
   },
   methods: {
     async logout() {
       await this.$store.dispatch("getLogout")
       return this.$router.push('/');
-    },
-    getImagePath(path: string) {
-      this.imageSrc = "_nuxt/" + path;
-      console.log('imgPath:', this.imageSrc);
     }
   }
 })
