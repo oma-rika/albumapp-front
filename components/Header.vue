@@ -26,11 +26,11 @@
             <!--[{{avatarImageData.AvatarFilePath}}]-->
             <v-avatar size="24">
                 <v-img 
-                  v-if="avatarImageData.AvatarFilePath"
-                  :src="`_nuxt/assets/${avatarImageData.AvatarFilePath}`"
+                  :src="require(`../assets/${imagePath}`)" alt="アバター画像"
                   width="24"
                   contain
-                ></v-img>
+                  v-if="imagePath"
+                />
                 <v-icon v-else>
                   mdi-account-circle
                 </v-icon>
@@ -72,6 +72,7 @@ export default Vue.extend({
         }).then((response) => {
           if (response.data.status == 'ok') {
             (this as any).avatarImageData = response.data.items[0];
+            this.getUrlPath(this.avatarImageData.AvatarFilePath);
           }          
         }).catch(error => {
             console.log('error');
@@ -91,12 +92,18 @@ export default Vue.extend({
         { text: 'ログアウト', icon: 'mdi-logout-variant', href: ''},
       ],
       avatarImageData: '',
+      imagePath: '',
     }
   },
   methods: {
     async logout() {
       await this.$store.dispatch("getLogout")
       return this.$router.push('/');
+    },
+    getUrlPath(path: string) {
+      if (path) {
+        this.imagePath = path.replace(/\\/g, "/");
+      }
     }
   }
 })
