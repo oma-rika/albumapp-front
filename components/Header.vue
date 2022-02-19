@@ -23,9 +23,21 @@
             v-on="on"
             dark
           >
-            <v-icon>
-              mdi-account-circle
-            </v-icon>
+            <!--[{{avatarImageData.AvatarFilePath}}]-->
+            <v-avatar size="24">
+                <!--<v-icon v-if="!imageSrc">
+                  mdi-account-circle
+                </v-icon>-->
+                <v-img 
+                  v-if="imageSrc"
+                  :src="imageSrc"
+                  width="24"
+                  contain
+                ></v-img>
+                <v-icon v-else>
+                  mdi-account-circle
+                </v-icon>
+            </v-avatar>
           </v-btn>
         </template>
 
@@ -51,7 +63,24 @@
 </template>
 <script lang="ts">
 import Vue from 'vue'
+import axios from 'axios'
+
 export default Vue.extend({
+  async fetch () {
+        const authToken = this.$store.getters.getAuthToken;
+        await axios.get('http://localhost:3010/userInfo', {
+            headers: {
+                Authorization:  `token ${authToken}`
+            }
+        }).then((response) => {
+          if (response.data.status == 'ok') {
+            (this as any).avatarImageData = response.data.items[0];
+            this.getImagePath(this.avatarImageData.AvatarFilePath);
+          }          
+        }).catch(error => {
+            console.log('error');
+        })
+  },
   props: {
       clippedLeft: {
         type: Boolean,
@@ -64,13 +93,19 @@ export default Vue.extend({
         { text: 'ダッシュボード', icon: 'mdi-view-dashboard-outline', href: 'dashboard'},
         { text: 'アカウント設定', icon: 'mdi-account-cog-outline', href: 'settings'},
         { text: 'ログアウト', icon: 'mdi-logout-variant', href: ''},
-      ]
+      ],
+      avatarImageData: '',
+      imageSrc: '',
     }
   },
   methods: {
     async logout() {
       await this.$store.dispatch("getLogout")
       return this.$router.push('/');
+    },
+    getImagePath(path: string) {
+      this.imageSrc = "_nuxt/" + path;
+      console.log('imgPath:', this.imageSrc);
     }
   }
 })

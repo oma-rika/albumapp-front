@@ -43,11 +43,11 @@ const mysql = require('mysql');
 const session = require('express-session');
 const multer = require('multer');
 const path = require('path');
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
 
 let storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        let destination = path.join(__dirname, '../updir'); // ./updir/
+        let destination = path.join(__dirname, '../assets/updir'); // ./updir/
 
         if (req.session && req.session.userId) {
             destination = path.join(destination, 'users', req.session.userId, uuid()); // ./up/users/1/generated-uuid/
@@ -338,6 +338,49 @@ app.post('/avatarUpload/:userId', multer({ storage: storage }).single('file'), (
             res.status(200).send('ファイルのアップロードが完了しました。');
         }
     )
+});
+
+app.get('/userInfo', cors(), (req, res) => {
+    if (req.headers) {
+        console.log('req.headers:', req.headers);
+        const bearToken = req.headers['authorization'];
+        if (bearToken) {
+            console.log('bearToken:', bearToken);
+            const bearer = bearToken.split(' ');
+            console.log('bearere');
+            const token = bearer[1];
+            jwt.verify(token, 'secret_key', (error, user) => {
+                if (error) {
+                    return res.status(403).send('Forbidden');
+                } else {
+                    console.log('成功');
+                    console.log('user:', user);
+                    console.log('user.payload.Id:', user.payload.id);
+                    let sql = 'SELECT AvatarFilePath, ShowAvatarFlag From albumapp.user WHERE ID=?;';
+                    connection.query(
+                        sql,
+                        [user.payload.id],
+                        (error, results) => {
+                            if (error) throw error;
+                            let items;
+                            if (results.length > 0) {
+
+                            }
+                            if (results.length > 0) {
+                                resMessage = 'ok';
+                            } else {
+                                resMessage = 'NotFound';
+                            }
+                            res.status(200).json({status: resMessage, items: results});
+                        }
+                    );
+                }
+            })
+        } else {
+            //後で確認
+            return res.status(403).send('取得できない');
+        }
+    }
 });
 
 app.listen(3010, () => {
