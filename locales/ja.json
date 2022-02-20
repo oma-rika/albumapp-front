@@ -2,5 +2,11 @@
     "title": {
         "signup": "会員登録",
         "login": "ログイン"
-    }
+    },
+    "welcomeAboutTitle": "簡単にデータを共有できます",
+    "welcomeStart": {
+        "title": "さっそく始めよう",
+        "subtitle": "まずは会員登録"
+    },
+    "welcomeStartSubTitle": "まずは会員登録"
 }

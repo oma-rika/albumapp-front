@@ -4,8 +4,8 @@
             cols="12"
             class="text-center"
         >
-            <h1>さっそく始めよう</h1>
-            <p>まずは会員登録！</p>
+            <h1>{{ $t('welcomeStart.title') }}</h1>
+            <p>{{ $t('welcomeStart.subtitle') }}</p>
             <v-btn
                 x-large
                 color="primary"
