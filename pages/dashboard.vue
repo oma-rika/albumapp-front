@@ -49,30 +49,28 @@
             <v-toolbar-title>test</v-toolbar-title>
         </v-app-bar>-->
         <v-main>
-            <v-container fluid>
-                <div
-                    style="max-width: 1100px;"
-                    class="mx-auto"
+            <v-container>
+                <h2 class="mb-5">ダッシュボード</h2>
+                <h4 class="mb-5">表示画面に移動</h4>
+                <v-row
+                    align="center"
                 >
-                    <h2 class="mb-5">ダッシュボード</h2>
-                    <h4 class="mb-5">表示画面に移動</h4>
-                    <v-row
-                        align="center"
+                    <v-col
+                        class="mb-md-10"
+                        v-for="(menu, i) in menuList"
+                        :key="i"
+                        cols="12"
+                        md="4"
+                        sm="6"
                     >
-                        <v-col
-                            class="mb-md-10"
-                            md="4"
-                            sm="3"
-                            v-for="(menu, i) in menuList"
-                            :key="i"
-                        >
-                                <v-hover v-slot="{ hover }">
-                                    <v-card
-                                        outlined
-                                        :elevation="hover ? 12 : 2"
-                                        :class="{ 'on-hover': hover }"
-                                        class="d-flex justify-space-between align-stretch"
-                                    >
+                            <v-hover v-slot="{ hover }">
+                                <v-card
+                                    outlined
+                                    :elevation="hover ? 12 : 2"
+                                    :class="{ 'on-hover': hover }"
+                                    class="d-flex justify-space-between align-stretch"
+                                >
+                                    <v-card-text>
                                         <v-list-item>
                                             <v-list-item-icon
                                                 title
@@ -97,29 +95,32 @@
                                                 </v-list-item-subtitle>
                                             </v-list-item-content>
                                         </v-list-item>
-                                    </v-card>
-                                </v-hover>
-                        </v-col>
-                    </v-row>
-                    <h4 class="mt-10 mt-md-0 mb-5">サービス一覧</h4>
-                    <v-row
-                        align="center"
-                        class="mb-sm-15"
-                        v-for="(service, i) in serviceList"
+                                    </v-card-text>
+                                </v-card>
+                            </v-hover>
+                    </v-col>
+                </v-row>
+                <h4 class="mt-10 mt-md-0 mb-5">サービス一覧</h4>
+                <v-row
+                    align="center"
+                    class="mb-sm-15"
+                    v-for="(service, i) in serviceList"
+                >
+                    <v-col
+                        class="mb-md-10"
+                        cols="12"
+                        md="4"
+                        sm="6"
                     >
-                        <v-col
-                            md="4"
-                            sm="3"
-                            class="mb-md-10"
-                        >
-                            <v-hover v-slot="{ hover }">
-                                <v-card
-                                    outlined
-                                    :elevation="hover ? 12 : 2"
-                                    :class="{ 'on-hover': hover }"
-                                    :key="i"
-                                    class="d-flex justify-space-between align-stretch"
-                                >
+                        <v-hover v-slot="{ hover }">
+                            <v-card
+                                outlined
+                                :elevation="hover ? 12 : 2"
+                                :class="{ 'on-hover': hover }"
+                                :key="i"
+                                class="d-flex justify-space-between align-stretch"
+                            >
+                                <v-card-text>
                                     <v-list-item>
                                         <v-list-item-icon
                                             title
@@ -143,11 +144,11 @@
                                             </v-list-item-subtitle>
                                         </v-list-item-content>
                                     </v-list-item>
-                                </v-card>
-                            </v-hover>
-                        </v-col>
-                    </v-row>
-                </div>
+                                </v-card-text>
+                            </v-card>
+                        </v-hover>
+                    </v-col>
+                </v-row>
             </v-container>
             <!--<v-btn @click="Test">テストボタン</v-btn>-->
         </v-main>
@@ -227,7 +228,6 @@ export default Vue.extend({
         },
     }
 })
-//serviceList[0].link = 'aaa';
 </script>
 <style lang="scss" scoped>
 .vlist-subtitle {
