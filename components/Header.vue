@@ -8,7 +8,20 @@
     >
       <slot name="navigation-toggle-button" />
       <!--<v-app-bar-nav-icon />-->
-      <v-toolbar-title>Page title</v-toolbar-title>
+      <div class="text-center">
+        <v-avatar
+          size="36"
+          color="purple"
+          class="mr-2"
+        >
+          <v-icon dark>
+            mdi-folder-image
+          </v-icon>
+        </v-avatar>
+      </div>
+      <v-toolbar-title>
+        Album App
+      </v-toolbar-title>
 
       <v-spacer />
       <v-menu
