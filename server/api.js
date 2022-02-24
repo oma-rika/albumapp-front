@@ -114,15 +114,15 @@ app.use(
 // )
 
 
-app.use((req, res, next) => {
-    if (req.session.userId == undefined) {
-        console.log('ログインしていません');
-        //res.redirect('/signin');
-    } else {
-        console.log('ログインしています');
-    }
-    next();
-});
+// app.use((req, res, next) => {
+//     if (req.session.userId == undefined) {
+//         console.log('ログインしていません');
+//         //res.redirect('/signin');
+//     } else {
+//         console.log('ログインしています');
+//     }
+//     next();
+// });
 
 connection.connect((err) => {
     if (err) throw err;
@@ -434,45 +434,41 @@ app.get('/albums2', cors(), (req, res) => {
 
 /* File Upload */
 app.post('/imagefileUpload', cors(), (req, res) => {
-    if (req.headers) {
-        console.log('req.headers:', req.headers);
-        const bearToken = req.headers['authorization'];
-        if (bearToken) {
-            console.log('bearToken:', bearToken);
-            const bearer = bearToken.split(' ');
-            console.log('bearere');
-            const token = bearer[1];
-            jwt.verify(token, 'secret_key', (error, user) => {
-                if (user) {
-                    req.session.userId = user.payload.id;
-                    console.log('imagefileUploadのuser.payload.Id:', user.payload.id);
-                }
-                const upload = multer({ storage: storage }).single('file');
-                upload(req, res, function(error) {
-                    if (error) {
-                        console.log('error', error);
-                    } else {
-                        console.log('成功');
-                        console.log(req.file);
-                        if (req.file) {
-                            const reqFilepath = req.file.path;
-                            const filePath = reqFilepath.substr(reqFilepath.indexOf('assets'));
-                            let sql = 'INSERT INTO albumapp.imagefile_db (UserId, FilePath) VALUES (?, ?)';
-                            connection.query(
-                                sql,
-                                [req.session.userId, filePath],
-                                (error, results) => {
-                                    if (error) {
-                                        res.status(500).send('Internal Error.');
-                                    }
-                                    res.status(200).send('ファイルのアップロードが完了しました。');
+    const bearToken = req.headers['authorization'];
+    if (!bearToken) {
+        res.status(500).send('Internal Error.');
+        res.end();
+    } else {
+        const bearer = bearToken.split(' ');
+        const token = bearer[1];
+        jwt.verify(token, 'secret_key', (error, user) => {
+            if (user) {
+                req.session.userId = user.payload.id;
+            }
+            const upload = multer({ storage: storage }).single('file');
+            upload(req, res, function(error) {
+                if (error) {
+                    res.status(500).send('Internal Error.');
+                    res.end();
+                } else {
+                    if (req.file) {
+                        const reqFilepath = req.file.path;
+                        const filePath = reqFilepath.substr(reqFilepath.indexOf('assets'));
+                        let sql = 'INSERT INTO albumapp.imagefile_db (UserId, FilePath) VALUES (?, ?)';
+                        connection.query(
+                            sql,
+                            [req.session.userId, filePath],
+                            (error, results) => {
+                                if (error) {
+                                    res.status(500).send('Internal Error.');
                                 }
-                            );
-                        }
+                                res.status(200).send('ファイルのアップロードが完了しました。');
+                            }
+                        );
                     }
-                });
-            })
-        }
+                }
+            });
+        })
     }
 });
 
