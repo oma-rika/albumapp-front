@@ -44,17 +44,32 @@ const session = require('express-session');
 const multer = require('multer');
 const path = require('path');
 const jwt = require('jsonwebtoken');
+const fs = require("fs");
 
 let storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        let destination = path.join(__dirname, '../assets/updir'); // ./updir/
 
-        if (req.session && req.session.userId) {
-            destination = path.join(destination, 'users', req.session.userId, uuid()); // ./up/users/1/generated-uuid/
-        } else {
-            destination = path.join(destination, 'images'); // ./updir/images
-        }
-        cb(null, destination);
+        console.log('dirname:', __dirname);
+
+        let destination = path.join(__dirname, '../assets'); // ./assets/
+    
+            if (req.session && req.session.userId) {
+                userId = String(req.session.userId);
+                destination = path.join(destination, 'updir', 'users', userId, uuid.v1()); // ./updir/users/1/generated-uuid/
+                try {
+                    fs.mkdirSync(destination, {recursive: true});
+                } catch {
+                    //uuidを使用して動的に生成しているが一応try-catchで確認する
+                    console.log(`${destination} は既に存在する.`);   
+                }
+
+            } else {
+                console.log('req.session.userIdが存在しない');
+                destination = path.join(destination, 'updir', 'tmp'); // ./assets/updir/tmp
+            }
+
+            cb(null, destination);
+
     },
     filename: function (req, file, cb) {
         cb(null, file.originalname)
@@ -362,7 +377,6 @@ app.get('/userInfo', cors(), (req, res) => {
                         [user.payload.id],
                         (error, results) => {
                             if (error) throw error;
-                            let items;
                             if (results.length > 0) {
 
                             }
@@ -379,6 +393,89 @@ app.get('/userInfo', cors(), (req, res) => {
         } else {
             //後で確認
             return res.status(403).send('取得できない');
+        }
+    }
+});
+/* multer Test */
+app.get('/albums2', cors(), (req, res) => {
+    if (req.headers) {
+        console.log('req.headers:', req.headers);
+        const bearToken = req.headers['authorization'];
+        if (bearToken) {
+            console.log('bearToken:', bearToken);
+            const bearer = bearToken.split(' ');
+            console.log('bearere:', bearer);
+            const token = bearer[1];
+            jwt.verify(token, 'secret_key', (error, user) => {
+                if (error) {
+                    return res.status(403).send('Forbidden');
+                } else {
+                    console.log('成功');
+                    console.log('user.payload.Id:', user.payload.id);
+                    //後で修正
+                    const sql = 'SELECT id, UserId, Path, UpdateTime, favorite FROM albumapp.image_db WHERE UserId = ?';
+                    connection.query(
+                        sql,
+                        [user.payload.id],
+                        (error, results) => {
+                            if (results.length > 0) {
+                                resMessage = 'ok';
+                            } else {
+                                resMessage = 'NotFound';
+                            }
+                            res.status(200).json({status: resMessage, items: results});
+                        }
+                    );
+                }
+            })
+        }
+    }
+});
+
+/* File Upload */
+app.post('/imagefileUpload', cors(), (req, res) => {
+    console.log('ポストされてきた');
+    let reqFilepath = req.file;
+    //let filepath = reqFilepath.substr(reqFilepath.indexOf('updir'));
+    console.log('reqFilepath:', reqFilepath);
+    if (req.headers) {
+        console.log('req.headers:', req.headers);
+        const bearToken = req.headers['authorization'];
+        if (bearToken) {
+            console.log('bearToken:', bearToken);
+            const bearer = bearToken.split(' ');
+            console.log('bearere');
+            const token = bearer[1];
+            jwt.verify(token, 'secret_key', (error, user) => {
+                if (user) {
+                    req.session.userId = user.payload.id;
+                    console.log('imagefileUploadのuser.payload.Id:', user.payload.id);
+                }
+                const upload = multer({ storage: storage }).single('file');
+                upload(req, res, function(error) {
+                    if (error) {
+                        console.log('error', error);
+                    } else {
+                        console.log('成功');
+                        console.log(req.file);
+                        if (req.file) {
+                            const reqFilepath = req.file.path;
+                            const filePath = reqFilepath.substr(reqFilepath.indexOf('assets'));
+                            let sql = 'INSERT INTO albumapp.imagefile_db (UserId, FilePath) VALUES (?, ?)';
+                            connection.query(
+                                sql,
+                                [req.session.userId, filePath],
+                                (error, results) => {
+                                    if (error) {
+                                        res.status(500).send('Internal Error.');
+                                    }
+                                    res.status(200).send('ファイルのアップロードが完了しました。');
+                                }
+                            );
+                        }
+                    }
+                });
+            })
         }
     }
 });
