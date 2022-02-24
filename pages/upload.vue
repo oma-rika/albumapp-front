@@ -18,8 +18,8 @@
                         cols="12"
                         align="center"
                     >
-                        <!-- 送信成功メッセージ -->
                         <v-fade-transition>
+                            <!-- 送信成功メッセージ -->
                             <v-alert
                                 dense
                                 text
@@ -31,11 +31,35 @@
                             >
                                 アップロードに成功しました。
                             </v-alert>
+                            <!-- 送信エラーメッセージ -->
+                            <v-alert
+                                dense
+                                outlined
+                                type="error"
+                                class="mt-12"
+                                max-width="600"
+                                transition="fade-transition"
+                                v-if="uploadErrorMsgFlag"
+                            >
+                                送信に失敗しました。しばらく経ってから再度お試し下さい。
+                            </v-alert>
+                            <!-- 画像読み込みエラーメッセージ -->
+                            <v-alert
+                                dense
+                                outlined
+                                type="error"
+                                class="mt-12"
+                                max-width="600"
+                                transition="fade-transition"
+                                v-if="readErrorMsgFlag"
+                            >
+                                取り込みに失敗しました。再度お試し下さい。
+                            </v-alert>
                         </v-fade-transition>
                     </v-col>
                 </v-row>
                 <v-card
-                    class="mt-12"
+                    class="mx-auto mt-12"
                     max-width="600"
                 >
                     <v-card-title>File Upload</v-card-title>
@@ -54,7 +78,7 @@
                 </v-card>
                 <v-card
                     v-if="binaryFile"
-                    class="mt-12"
+                    class="mx-auto mt-12"
                     max-width="600"
                 >
                     <v-card-title>取り込んだデータを表示</v-card-title>
@@ -78,14 +102,14 @@
                     </v-card-text>
                     <v-card-actions>
                         <v-spacer />
-                        <!--<v-btn
+                        <v-btn
                             color="blue-grey"
                             class="ma-2 white--text"
-                            @click="cancelButton"
+                            @click="resetVal"
                             :loading="loading"
                         >
                             Cancel
-                        </v-btn>-->
+                        </v-btn>
                         <v-btn
                             color="info"
                             class="ma-2 white--text"
@@ -122,6 +146,8 @@ export default Vue.extend({
             loading: false,
             filename: '',
             uploadSuccessfulFlag: false,
+            uploadErrorMsgFlag: false,
+            readErrorMsgFlag: false,
             clickCount: 0,
             inputVal: null,
         }
@@ -129,8 +155,6 @@ export default Vue.extend({
     methods: {
         readImage(event: any): void {
             if (event) {
-                console.log('event:', event);
-                console.log('fileval:', this.fileval)
                 const inputImage = event;
                 //POSTする際にも使用
                 this.filename = event;
@@ -148,6 +172,10 @@ export default Vue.extend({
                 }
                 reader.onerror = (e) => {
                     alert('読み取り時にエラーが発生しました');
+                    this.readErrorMsgFlag = true;
+                    setTimeout(() => {
+                        this.readErrorMsgFlag = false;
+                    }, 2500);
                 }
             }
         },
@@ -168,6 +196,7 @@ export default Vue.extend({
                     this.uploadSuccessful();
                 }).catch(error => {
                     console.log('error:', error);
+                    this.uploadFailure(error);
                 });
             }
 
@@ -189,6 +218,15 @@ export default Vue.extend({
             this.binaryFile = '';
             this.filename = '';
             this.inputVal = null;
+        },
+        // 正常にアップロードされない場合はエラーメッセージを表示する
+        uploadFailure({response}:{response:any}) {
+            if (response && response.status === 500) {
+                this.uploadErrorMsgFlag = true;
+                setTimeout(() => {
+                    this.uploadErrorMsgFlag = false;
+                }, 2500);
+            }
         }
     }
 })
