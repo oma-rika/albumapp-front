@@ -434,10 +434,6 @@ app.get('/albums2', cors(), (req, res) => {
 
 /* File Upload */
 app.post('/imagefileUpload', cors(), (req, res) => {
-    console.log('ポストされてきた');
-    let reqFilepath = req.file;
-    //let filepath = reqFilepath.substr(reqFilepath.indexOf('updir'));
-    console.log('reqFilepath:', reqFilepath);
     if (req.headers) {
         console.log('req.headers:', req.headers);
         const bearToken = req.headers['authorization'];
