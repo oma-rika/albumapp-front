@@ -256,8 +256,6 @@ app.get('/albums/:userId/:limit', cors(), (req, res) => {
 });
 
 app.post('/favorite', cors(), (req, res) => {
-    console.log('お気に入り登録');
-    //console.log('tokenを確認');
     console.log('req.body.id', req.body.id);
     if (req.headers) {
         console.log('req.headers:', req.headers);
@@ -275,7 +273,7 @@ app.post('/favorite', cors(), (req, res) => {
                 console.log('user.payload.Id:', user.payload.id);
                 let like = req.body.favorite ? 1 : 0;
                 console.log('like', like);
-                let sql = 'UPDATE albumapp.image_db SET favorite=? WHERE id=? AND UserId=?';
+                let sql = 'UPDATE albumapp.imagefile_db SET favorite=? WHERE ID=? AND UserId=?';
                 connection.query(
                     sql,
                     [like, req.body.id, user.payload.id],
@@ -397,38 +395,35 @@ app.get('/userInfo', cors(), (req, res) => {
     }
 });
 /* multer Test */
-app.get('/albums2', cors(), (req, res) => {
-    if (req.headers) {
-        console.log('req.headers:', req.headers);
-        const bearToken = req.headers['authorization'];
-        if (bearToken) {
-            console.log('bearToken:', bearToken);
-            const bearer = bearToken.split(' ');
-            console.log('bearere:', bearer);
-            const token = bearer[1];
-            jwt.verify(token, 'secret_key', (error, user) => {
-                if (error) {
-                    return res.status(403).send('Forbidden');
-                } else {
-                    console.log('成功');
-                    console.log('user.payload.Id:', user.payload.id);
-                    //後で修正
-                    const sql = 'SELECT id, UserId, Path, UpdateTime, favorite FROM albumapp.image_db WHERE UserId = ?';
-                    connection.query(
-                        sql,
-                        [user.payload.id],
-                        (error, results) => {
-                            if (results.length > 0) {
-                                resMessage = 'ok';
-                            } else {
-                                resMessage = 'NotFound';
-                            }
-                            res.status(200).json({status: resMessage, items: results});
+app.get('/FilePathData', cors(), (req, res) => {
+    const bearToken = req.headers['authorization'];
+    if (bearToken) {
+        console.log('bearToken:', bearToken);
+        const bearer = bearToken.split(' ');
+        console.log('bearere:', bearer);
+        const token = bearer[1];
+        jwt.verify(token, 'secret_key', (error, user) => {
+            if (error) {
+                return res.status(403).send('Forbidden');
+            } else {
+                console.log('成功');
+                console.log('user.payload.Id:', user.payload.id);
+                //後で修正
+                const sql = 'SELECT id, UserId, FilePath, PublicFlag, favorite FROM albumapp.imagefile_db WHERE UserId = ?';
+                connection.query(
+                    sql,
+                    [user.payload.id],
+                    (error, results) => {
+                        if (results.length > 0) {
+                            resMessage = 'ok';
+                        } else {
+                            resMessage = 'NotFound';
                         }
-                    );
-                }
-            })
-        }
+                        res.status(200).json({status: resMessage, items: results});
+                    }
+                );
+            }
+        })
     }
 });
 
@@ -468,6 +463,38 @@ app.post('/imagefileUpload', cors(), (req, res) => {
                     }
                 }
             });
+        })
+    }
+});
+
+app.get('/favoriteSelectData', cors(), (req, res) => {
+    const bearToken = req.headers['authorization'];
+    if (bearToken) {
+        console.log('bearToken:', bearToken);
+        const bearer = bearToken.split(' ');
+        console.log('bearere:', bearer);
+        const token = bearer[1];
+        jwt.verify(token, 'secret_key', (error, user) => {
+            if (error) {
+                return res.status(403).send('Forbidden');
+            } else {
+                console.log('成功');
+                console.log('user.payload.Id:', user.payload.id);
+                //後で修正
+                const sql = 'SELECT id, UserId, FilePath, PublicFlag, favorite FROM albumapp.imagefile_db WHERE UserId = ? AND favorite = 1';
+                connection.query(
+                    sql,
+                    [user.payload.id],
+                    (error, results) => {
+                        if (results.length > 0) {
+                            resMessage = 'ok';
+                        } else {
+                            resMessage = 'NotFound';
+                        }
+                        res.status(200).json({status: resMessage, items: results});
+                    }
+                );
+            }
         })
     }
 });
