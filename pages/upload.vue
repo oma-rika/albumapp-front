@@ -148,7 +148,6 @@ export default Vue.extend({
             uploadSuccessfulFlag: false,
             uploadErrorMsgFlag: false,
             readErrorMsgFlag: false,
-            clickCount: 0,
             inputVal: null,
         }
     },
@@ -181,9 +180,6 @@ export default Vue.extend({
         },
         uploadFile(): void {
             this.loading = true;
-            this.clickCount++;
-            console.log('clickCount:', this.clickCount);
-            
             if (this.binaryFile) {
                 const authToken = this.$store.getters.getAuthToken;
                 const formData = new FormData();
