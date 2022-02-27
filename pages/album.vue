@@ -87,6 +87,7 @@
                                         icon
                                     >
                                         <v-icon
+                                            @click="addPublicItem(card)"
                                             :color="card.PublicFlag ? 'primary' : ''"
                                         >
                                             mdi-account-plus
@@ -96,7 +97,6 @@
                                         icon
                                     >
                                         <v-icon
-                                            :color="card.PublicFlag ? 'orange' : ''"
                                         >
                                             mdi-trash-can
                                         </v-icon>
@@ -165,15 +165,33 @@ export default Vue.extend({
                     Authorization:  `token ${authToken}`
                 }
             }).then(response => {
-                this.addFavoriteSuccessful(response);
+                this.uploadSuccessful(response);
             }).catch(error => {
-                this.addFavoriteFailure(error);
+                this.uploadFailure(error);
             });
         },
-        addFavoriteSuccessful (response:any) {
+        async addPublicItem(card: any) {
+            card.PublicFlag = !card.PublicFlag;
+            let p = {
+                id: card.id,
+                public: card.PublicFlag
+            };
+            console.log('p:', p);
+            const authToken = this.$store.getters.getAuthToken;
+            await axios.post('http://localhost:3010/shareItem/', p, {
+                headers: {
+                    Authorization:  `token ${authToken}`
+                }
+            }).then(response => {
+                this.uploadSuccessful(response);
+            }).catch(error => {
+                this.uploadFailure(error);
+            });
+        },
+        uploadSuccessful (response:any) {
             console.log('成功した');
         },
-        addFavoriteFailure (error: AxiosError<{error: string}>) {
+        uploadFailure (error: AxiosError<{error: string}>) {
             console.log('失敗した');
         },
     }

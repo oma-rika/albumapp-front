@@ -273,7 +273,7 @@ app.post('/favorite', cors(), (req, res) => {
                 console.log('user.payload.Id:', user.payload.id);
                 let like = req.body.favorite ? 1 : 0;
                 console.log('like', like);
-                let sql = 'UPDATE albumapp.imagefile_db SET favorite=? WHERE ID=? AND UserId=?';
+                let sql = 'UPDATE albumapp.imagefile_db SET favorite=? WHERE id=? AND UserId=?';
                 connection.query(
                     sql,
                     [like, req.body.id, user.payload.id],
@@ -284,6 +284,34 @@ app.post('/favorite', cors(), (req, res) => {
                 );
             }
         })
+    }
+});
+
+app.post('/shareItem', cors(), (req, res) => {
+    console.log('req.body.id', req.body.id);
+    const bearToken = req.headers['authorization'];
+    if (!bearToken) {
+        res.status(500).send('Internal Error.');
+        res.end();
+    } else {
+        const bearer = bearToken.split(' ');
+        const token = bearer[1];
+        jwt.verify(token, 'secret_key', (error, user) => {
+            if (error) {
+                return res.status(403).send('Forbidden');
+            }
+            let publicItem = req.body.public ? 1 : 0;
+            let sql = 'UPDATE albumapp.imagefile_db SET PublicFlag=? WHERE id=? AND UserId=?';
+            connection.query(
+                sql,
+                [publicItem, req.body.id, user.payload.id],
+                (error, results) => {
+                    //後で確認
+                    if (error) throw error;
+                    res.status(200).send('送信完了');
+                }
+            );
+        });
     }
 });
 
@@ -481,7 +509,8 @@ app.get('/favoriteSelectData', cors(), (req, res) => {
                 console.log('成功');
                 console.log('user.payload.Id:', user.payload.id);
                 //後で修正
-                const sql = 'SELECT id, UserId, FilePath, PublicFlag, favorite FROM albumapp.imagefile_db WHERE UserId = ? AND favorite = 1';
+                const sql = 'SELECT * FROM albumapp.imagefile_db WHERE UserId = ? AND favorite = 1';
+                let resMessage;
                 connection.query(
                     sql,
                     [user.payload.id],
@@ -496,6 +525,41 @@ app.get('/favoriteSelectData', cors(), (req, res) => {
                 );
             }
         })
+    }
+});
+
+app.get('/allShareData', cors(), (req, res) => {
+    console.log('allShareDataに遷移');
+    const bearToken = req.headers['authorization'];
+    if (!bearToken) {
+        res.status(500).send('Internal Error.');
+        res.end();
+    } else {
+        const bearer = bearToken.split(' ');
+        const token = bearer[1];
+        jwt.verify(token, 'secret_key', (error, user) => {
+            if (error) {
+                res.status(500).send('Internal Error.');
+                res.end();  
+            } else {
+                //後で修正
+                const sql = 'SELECT * FROM albumapp.imagefile_db WHERE UserId = ? AND PublicFlag = 1';
+                let resMessage;
+                connection.query(
+                    sql,
+                    [user.payload.id],
+                    (error, results) => {
+                        if (error) throw error;
+                        if (results.length > 0) {
+                            resMessage = 'ok';
+                        } else {
+                            resMessage = 'NotFound';
+                        }
+                        res.status(200).json({status: resMessage, items: results});
+                    }
+                );
+            }
+        });
     }
 });
 

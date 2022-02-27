@@ -11,43 +11,6 @@
         <NavigationDrawer
         :drawer.sync="drawer"
         />
-        <!--<v-navigation-drawer
-           v-model="drawer"
-           app
-        >
-            <template v-slot:prepend>
-                <v-list-item two-line>
-                    <v-list-item-avatar>
-                        <img src="https://randomuser.me/api/portraits/women/81.jpg">
-                    </v-list-item-avatar>
-                    <v-list-item-content>
-                        <v-list-item-title>User Name</v-list-item-title>
-                        <v-list-item-subtitle />
-                    </v-list-item-content>
-                </v-list-item>
-            </template>
-            <v-divider></v-divider>
-            <v-list
-                dense
-                nav
-            >
-                <v-list-item
-                    v-for="item in items"
-                    :key="item.title"
-                >
-                    <v-list-item-icon>
-                        <v-icon>{{ item.icon}}</v-icon>
-                    </v-list-item-icon>
-                    <v-list-item-content>
-                        <v-list-item-title>{{ item.title }}</v-list-item-title>
-                    </v-list-item-content>
-                </v-list-item>
-            </v-list>
-        </v-navigation-drawer>
-        <v-app-bar app>
-            <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
-            <v-toolbar-title>test</v-toolbar-title>
-        </v-app-bar>-->
         <v-main>
             <v-container>
                 <h2 class="mb-5">ダッシュボード</h2>
@@ -195,7 +158,7 @@ export default Vue.extend({
                 {
                     title: 'アップロード画面に移動',
                     text: 'デスクトップにあるデータを選択して投稿する。',
-                    link: 'edit',
+                    link: 'upload',
                     icon: 'mdi-tray-arrow-up'
                 }
             ]
@@ -205,9 +168,9 @@ export default Vue.extend({
         const userId = this.$store.getters.getCurrentUserId;
         console.log('userId:', userId);
         if (userId) {
-            this.menuList[0].link = 'project/' + userId;
-            this.menuList[1].link = 'favorite/' + userId;
-            this.menuList[2].link = 'share/' + userId;
+            this.menuList[0].link = 'album';
+            this.menuList[1].link = 'favorite';
+            this.menuList[2].link = 'share';
         }
         console.log('menuList:', this.menuList);
     },

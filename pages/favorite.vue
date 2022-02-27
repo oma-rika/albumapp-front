@@ -24,7 +24,7 @@
                             outlined
                             class="pt-20"
                             max-width="600"
-                            v-if="!albums && NothingFlag"
+                            v-if="NothingFlag"
                         >
                             <v-row align="center">
                                 <v-col class="grow">
@@ -130,9 +130,8 @@ export default Vue.extend({
                 return { albums: response.data.items};
             }
 
-            if (response.data.status == 'NotFount') {
-                this.NothingFlag = true;
-                return;
+            if (response.data.status == 'NotFound') {
+                return { NothingFlag: true };
             }
         }).catch(error => {
             console.log('取得前にエラーが発生');
