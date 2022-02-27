@@ -81,7 +81,7 @@ const connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     database: 'albumapp',
-    password: '*****', //2021-11-18 PassWordChange
+    password: 'k090480', //2021-11-18 PassWordChange
 });
 
 //express-session
