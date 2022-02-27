@@ -56,9 +56,6 @@
                                     </v-form>
                                 </v-card-text>
                             </v-card>
-                            <v-card >
-
-                            </v-card>
                         </v-col>
                     </v-row>
                 </v-container>
@@ -121,7 +118,7 @@ export default Vue.extend({
                     console.log('ok');
                     this.auth.push(response.data.items[0]);
                     //console.log('this.auth:', this.auth);
-                    console.log('response.data.items:', response.data.items[0]);
+                    //console.log('response.data.items:', response.data.items[0]);
                     this.$store.dispatch("updateMessageAction", response.data.items[0]);
                     //this.auth = response.data.items[0];
                     //成功したらリダイレクト

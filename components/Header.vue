@@ -39,10 +39,10 @@
             <!--[{{avatarImageData.AvatarFilePath}}]-->
             <v-avatar size="24">
                 <v-img 
-                  :src="require(`../assets/${imagePath}`)" alt="アバター画像"
+                  :src="require(`../assets/${userInfo.avatar}`)" alt="アバター画像"
                   width="24"
                   contain
-                  v-if="imagePath"
+                  v-if="userInfo.avatar"
                 />
                 <v-icon v-else>
                   mdi-account-circle
@@ -77,6 +77,7 @@ import axios from 'axios'
 
 export default Vue.extend({
   async fetch () {
+        this.userInfo = this.$store.getters.getCurrentUserInfo;
         const authToken = this.$store.getters.getAuthToken;
         await axios.get('http://localhost:3010/userInfo', {
             headers: {
@@ -85,7 +86,6 @@ export default Vue.extend({
         }).then((response) => {
           if (response.data.status == 'ok') {
             (this as any).avatarImageData = response.data.items[0];
-            this.getUrlPath(this.avatarImageData.AvatarFilePath);
           }          
         }).catch(error => {
             console.log('error');
@@ -106,17 +106,13 @@ export default Vue.extend({
       ],
       avatarImageData: '',
       imagePath: '',
+      userInfo: {},
     }
   },
   methods: {
     async logout() {
       await this.$store.dispatch("getLogout")
       return this.$router.push('/');
-    },
-    getUrlPath(path: string) {
-      if (path) {
-        this.imagePath = path.replace(/\\/g, "/");
-      }
     }
   }
 })

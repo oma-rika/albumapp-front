@@ -42,7 +42,16 @@ const createStore = () => {
                 } else {
                     console.log('tokenが取得できません');
                 }
-            }
+            },
+            getCurrentUserInfo: (state, getters) => {
+                if (state.user.current) {
+                    return {
+                            userName: state.user.current.Account,
+                            NickName: state.user.current.NickName,
+                            avatar:   state.user.current.AvatarFilePath
+                    };
+                }
+            } 
         },
         // mutations: {
         //     updateMessage: function(state) {
@@ -83,7 +92,9 @@ const createStore = () => {
             //20210107追加
             setCurrentUser (state, payload) {
                 state.user.current = payload;
-                console.log('state.user.current', state.user.current.Account);
+                if (state.user.current.AvatarFilePath) {
+                    state.user.current.AvatarFilePath = state.user.current.AvatarFilePath.replace(/\\/g, "/");
+                }
             },
             setAuthToken (state, payload) {
                 console.log('tokenを保存');
