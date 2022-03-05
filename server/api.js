@@ -315,6 +315,42 @@ app.post('/shareItem', cors(), (req, res) => {
     }
 });
 
+app.get('/shareAllItem', cors(), (req, res) => {
+    console.log('公開する画像を全て出力');
+    const bearToken = req.headers['authorization'];
+    if (!bearToken) {
+        res.status(500).send('Internal Error.');
+        res.end();
+    } else {
+        const bearer = bearToken.split(' ');
+        const token = bearer[1];
+        jwt.verify(token, 'secret_key', (error, user) => {
+            if (error) {
+                return res.status(403).send('Forbidden');
+            } else {
+                console.log('成功');
+                console.log('user.payload.Id:', user.payload.id);
+                let sql = 'SELECT * FROM albumapp.imagefile_db WHERE PublicFlag=1';
+                connection.query(
+                    sql,
+                    (error, results) => {
+                        if (error) throw error;
+                        if (results.length > 0) {
+
+                        }
+                        if (results.length > 0) {
+                            resMessage = 'ok';
+                        } else {
+                            resMessage = 'NotFound';
+                        }
+                        res.status(200).json({status: resMessage, items: results});
+                    }
+                );      
+            }
+        });
+    }
+});
+
 app.post('/signup', cors(), (req, res) => {
     console.log('post受け取り');
     //post値受け取れるか確認
@@ -556,6 +592,36 @@ app.get('/allShareData', cors(), (req, res) => {
                             resMessage = 'NotFound';
                         }
                         res.status(200).json({status: resMessage, items: results});
+                    }
+                );
+            }
+        });
+    }
+});
+
+app.post('/passwordChange', cors(), (req, res) => {
+    const bearToken = req.headers['authorization'];
+    if (!bearToken) {
+        res.status(500).send('Internal Error.');
+        res.end();
+    } else {
+        const bearer = bearToken.split(' ');
+        const token = bearer[1];
+        jwt.verify(token, 'secret_key', (error, user) => {
+            if (error) {
+                return res.status(403).send('Forbidden');
+            }
+            if (user) {
+                if (user.payload.password !== req.body.currentPassword) {
+                    return res.status(403).send('Forbidden');
+                }
+                const sql = 'UPDATE albumapp.user SET Password=? WHERE id=? AND Password=?';
+                connection.query(
+                    sql,
+                    [req.body.newPassword, user.payload.id, req.body.currentPassword],
+                    (error, results) => {
+                        if (error) throw error;
+                        res.status(200).send('送信完了');
                     }
                 );
             }
