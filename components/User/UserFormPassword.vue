@@ -38,7 +38,7 @@ export default Vue.extend({
             const minLength = '8文字以上'
             const msg = `${minLength}です。半角英数記号が使えます。`
             //ログインページ=入力必須
-            //会員登録ページ=入力必須,8文字以上,72文字以下,書式チェック
+            //会員登録ページと更新ページ=入力必須,8文字以上,72文字以下,書式チェック
             const required = (value: string) => !!value || '';
             const format = (value: string) => /^[\w-@!#,.$]{8,72}$/.test(value) || msg;
             const rules = this.setValidation ? [format] : [required];
