@@ -4,7 +4,7 @@ export default {
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    titleTemplate: `albumApp | %s`,
+    title: 'albumApp',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
@@ -67,7 +67,7 @@ export default {
           info: '4FC1E9',
           success: '44D69E',
           warning: 'FEB65E',
-          error: 'FB8678',
+          error: 'FF1744',
           background: 'f6f6f4'
         }
       }
@@ -81,11 +81,13 @@ export default {
     vueI18n: {
       fallbackLocale: 'ja',
       // silentTranslationWarn: true,
+      // true =>　警告を発生させない(翻訳のキーが存在しない場合のみ警告)
       silentFallbackWarn: true,
       messages: {
         ja: require('./locales/ja.json'),
         en: require('./locales/en.json')
-      }
+      },
+      strategy: 'prefix_and_default', // URLに言語のプレフィックスを追加するかの指定
     }
   },
   // Build Configuration: https://go.nuxtjs.dev/config-build
