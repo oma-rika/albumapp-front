@@ -52,7 +52,7 @@ let storage = multer.diskStorage({
         console.log('dirname:', __dirname);
 
         let destination = path.join(__dirname, '../assets'); // ./assets/
-    
+
             if (req.session && req.session.userId) {
                 userId = String(req.session.userId);
                 destination = path.join(destination, 'updir', 'users', userId, uuid.v1()); // ./updir/users/1/generated-uuid/
@@ -60,7 +60,7 @@ let storage = multer.diskStorage({
                     fs.mkdirSync(destination, {recursive: true});
                 } catch {
                     //uuidを使用して動的に生成しているが一応try-catchで確認する
-                    console.log(`${destination} は既に存在する.`);   
+                    console.log(`${destination} は既に存在する.`);
                 }
 
             } else {
@@ -345,7 +345,7 @@ app.get('/shareAllItem', cors(), (req, res) => {
                         }
                         res.status(200).json({status: resMessage, items: results});
                     }
-                );      
+                );
             }
         });
     }
@@ -576,10 +576,10 @@ app.get('/allShareData', cors(), (req, res) => {
         jwt.verify(token, 'secret_key', (error, user) => {
             if (error) {
                 res.status(500).send('Internal Error.');
-                res.end();  
+                res.end();
             } else {
                 //後で修正
-                const sql = 'SELECT * FROM albumapp.imagefile_db WHERE UserId = ? AND PublicFlag = 1';
+                const sql = "SELECT * FROM albumapp.imagefile_db WHERE id = 1";
                 let resMessage;
                 connection.query(
                     sql,
