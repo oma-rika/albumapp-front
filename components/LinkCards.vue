@@ -9,14 +9,8 @@
             :cols="card.flex"
         >
             <v-card>
-                <!--{{ card }}-->
-                <!--{{card.FilePath | dirPath}}-->
-                <!--<v-card-subtitle v-text="{{ card.UpdateTime | datetime}}"></v-card-subtitle>
-                <v-img
-                    :src="dirPath(card.FilePath)" alt="アバター画像"
-                    height="200px"
-                />
-                <v-card-subtitle v-text="{{ card.UpdateTime }}"></v-card-subtitle>
+                <v-img :src="`appData/${card.FilePath}`" height="200px" />
+                <v-card-subtitle>{{ card.UpdateTime | datetime }}</v-card-subtitle>
                 <v-card-actions>
                     <v-spacer />
                     <v-btn icon>
@@ -54,32 +48,19 @@ export default Vue.extend({
     }
   },
   filters: {
-      /*dirPath: function(val:string) {
-          if (!val) return '';
-          return  '~/' + val.replace(/\\/g, "/");
-      }*/
-      datetime: function(val:string) {
+      datetime: function(val:any) {
         if (!val) return;
-        console.log(val);
-        //console.log(typeof datetime);
-        //const date = new Date(val * 1000);
-        const yyyy = `${val.getFullYear()}`;
-        // .slice(-2)で文字列中の末尾の2文字を取得する
-        // `0${date.getHoge()}`.slice(-2) と書くことで０埋めをする
-        //const MM = `0${date.getMonth() + 1}`.slice(-2); // getMonth()の返り値は0が基点
-        //const dd = `0${date.getDate()}`.slice(-2);
-        //const HH = `0${date.getHours()}`.slice(-2);
-        //const mm = `0${date.getMinutes()}`.slice(-2);
-        //const ss = `0${date.getSeconds()}`.slice(-2);
+        const date = new Date(val);
+        const yyyy = date.getFullYear();
+        console.log(yyyy);
+        // 0埋めにする
+        const MM = `0${date.getMonth() + 1}`.slice(-2);
+        const dd = `0${date.getDate()}`.slice(-2);
+        const HH = `0${date.getHours()}`.slice(-2);
+        const mm = `0${date.getMinutes()}`.slice(-2);
+        const ss = `0${date.getSeconds()}`.slice(-2);
 
-        //return `${yyyy}年${MM}月${dd}日 ${HH}:${mm}:${ss}`;
-        return `11年';
-      }
-  },
-  methods: {
-      dirPath: function(val:string) {
-          if (!val) return '';
-          return  '_nuxt/' + val.replace(/\\/g, "/");
+        return `${yyyy}年${MM}月${dd}日 ${HH}:${mm}:${ss}`;
       }
   }
 })

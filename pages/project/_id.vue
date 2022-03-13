@@ -63,8 +63,74 @@
                               <v-icon>mdi-tray-arrow-down</v-icon>
                           </v-btn>
                           <v-btn icon>
-                              <v-icon>mdi-share-variant</v-icon>
+                            <v-icon
+                              @click="publicItem(card)"
+                            >
+                              <v-icon>mdi-lock</v-icon>
+                            </v-icon>
                           </v-btn>
+                          <!--<v-dialog
+                            v-model="dialog"
+                            width="500"
+                          >
+                            <template v-slot:activator="{on, attrs }">
+                              <v-btn 
+                                icon
+                                v-bind="attrs"
+                                v-on="on"
+                              >
+                                <v-icon>mdi-account-plus</v-icon>
+                              </v-btn>
+                            </template>
+                            <v-card>
+                              <v-card-title>共有リンクを取得</v-card-title>
+                              <v-card-text　class="pb-0">
+                                  このリンクを知っている全員が閲覧できます。
+                                  <v-row>
+                                    <v-col
+                                      cols="12"
+                                      sm="8"
+                                    >
+                                      <v-text-field
+                                        v-model="linkPath"
+                                        filled
+                                      ></v-text-field>
+                                    </v-col>
+                                    <v-col
+                                      cols="12"
+                                      sm="4"
+                                      align-self="center"
+                                    >
+                                      <v-btn 
+                                        text
+                                        @click="clipCopy"
+                                      >リンクをコピー</v-btn> 
+                                    </v-col>
+                                  </v-row>
+                                  <v-chip
+                                    color="primary"
+                                    outlined
+                                    pill
+                                  >
+                                  ファイル名
+                                  </v-chip>
+                                  <v-card-actions class="px-0 pu-0">
+                                    <v-spacer />
+                                    <v-btn>
+                                      キャンセル
+                                    </v-btn>
+                                    <v-btn
+                                      type="submit"
+                                      color="primary"
+                                      class="white--text"
+                                    >
+                                      完了
+                                    </v-btn>
+                                  </v-card-actions>
+                                </v-form>
+                              </v-card-text>
+                            </v-card>
+                          </v-dialog>-->
                       </v-card-actions>
                   </v-card>
               </v-col>
@@ -115,6 +181,14 @@ export default Vue.extend({
       albums: {
 
       },
+      dialog: false,
+      params: {
+          //TODO 削除する
+          user: {
+              email: '',
+          }
+      },
+      linkPath: ''
     }
   },
   methods: {
@@ -148,6 +222,12 @@ export default Vue.extend({
     },
     addFavoriteFailure (error: AxiosError<{error: string}>) {
       console.log('失敗');
+    },
+    clipCopy() {
+      navigator.clipboard.writeText(this.linkPath);
+    },
+    publicItem(card:any) {
+      console.log('publicItemを選択');
     }
   },
 })

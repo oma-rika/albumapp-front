@@ -96,7 +96,8 @@ export default {
       presets({ isServer }, [ preset, options ]) {
         options.loose = true;
       }
-    }
+    },
+    publicPath: '/appData/'
   },
 
   router: {
