@@ -37,8 +37,10 @@ export default Vue.extend({
         }).then(response => {
 
             if (response.data.status == 'ok') {
-                console.log('apiは通信できた');
-                console.log('response.data:', response.data);
+                const list = response.data.items;
+                for (let i = 0; i < list.length; i++) {
+                    list[i].FilePath = list[i].FilePath.replace(/\\/g, "/");
+                }
                 (this as any).albums = response.data.items;
             }
 
@@ -60,5 +62,3 @@ export default Vue.extend({
   }
 })
 </script>
-<style>
-</style>
