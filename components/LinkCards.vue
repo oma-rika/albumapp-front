@@ -13,9 +13,10 @@
                 <v-card-subtitle>{{ card.UpdateTime | datetime }}</v-card-subtitle>
                 <v-card-actions>
                     <v-spacer />
-                    <v-btn icon>
-                        <v-icon>mdi-heart</v-icon>
-                    </v-btn>
+                    <FavoriteButton
+                        v-bind:shared="card.favorite"
+                        v-on:click="updateFavoriteFlag($event, card)"
+                    />
                     <v-btn icon>
                         <v-icon>mdi-tray-arrow-down</v-icon>
                     </v-btn>
@@ -62,6 +63,31 @@ export default Vue.extend({
 
         return `${yyyy}年${MM}月${dd}日 ${HH}:${mm}:${ss}`;
       }
+  },
+  methods: {
+        async updateFavoriteFlag(event, card) {
+            card.favorite = event;
+            const param = {
+                id: card.id,
+                favorite: event
+            };
+            const authToken = this.$store.getters.getAuthToken;
+            await axios.post('http://localhost:3010/favorite/', param, {
+                headers: {
+                    Authorization:  `token ${authToken}`
+                }
+            }).then(response => {
+                this.addFavoriteSuccessful(response);
+            }).catch(error => {
+                this.addFavoriteFailure(error);
+            });
+        },
+        addFavoriteSuccessful (response:any) {
+            console.log('成功した');
+        },
+        addFavoriteFailure (error: AxiosError<{error: string}>) {
+            console.log('失敗した');
+        },
   }
 })
 </script>
