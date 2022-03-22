@@ -13,8 +13,7 @@ import Vue from 'vue'
 export default Vue.extend({
     props: {
         shared: {
-            type: Boolean,
-            default: false
+            default: 0
         }
     }
 })
