@@ -629,6 +629,46 @@ app.post('/passwordChange', cors(), (req, res) => {
     }
 });
 
+//ダウンロード機能
+app.get('/download', cors(), (req, res) => {
+    console.log('downloadに遷移');
+    let filepath = req.query.filepath;
+    let filetype = filepath.split('.').pop();
+    //console.log('filepath:', filepath);
+    //console.log('filetype:', filetype);
+    //let contentType = `image/${filetype}`;
+    //console.log('contentype:', contentType);    
+    //res.setHeader('Content-Type', contentType);
+
+    //let filename = encodeURI(filepath);
+    //末尾だけ
+    let imgfilename = filepath.split('/').pop();
+    let filename = encodeURI(imgfilename);
+
+
+    //console.log('filename:', filename);
+    //res.setHeader('Content-Disposition:', `attachment; filename=${filename}`);
+    res.setHeader('Content-disposition', `attachment; filename=${filename}`);
+
+    try {
+        let test = encodeURI(filepath);
+        let image = fs.readFileSync(filepath);
+        console.log('image:')
+        let contentType = `image/${filetype}`;
+        //console.log('contentype:', contentType);    
+        res.writeHead(200, {'Content-Type':`${contentType}`});
+        //res.download(filepath);
+        //console.log('filepath:', filepath);
+        res.end(image);
+        return;
+    } catch (error) {
+        console.log('error:', error.code);
+        //res.send(403).send('Not Found');
+        //res.end();
+    }
+    
+});
+
 app.listen(3010, () => {
     console.log('api');
 });
