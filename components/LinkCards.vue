@@ -17,11 +17,17 @@
                         v-bind:shared="card.favorite"
                         v-on:click="updateFavoriteFlag($event, card)"
                     />
-                    <v-btn 
+                    <!--<v-btn 
                         icon
                         @click="download(card)"
                     >
                         <v-icon>mdi-tray-arrow-down</v-icon>
+                    </v-btn>-->
+                    <v-btn
+                        icon
+                        :href="`http://localhost:3010/download?filepath=${card.FilePath}`"
+                    >
+                       <v-icon>mdi-tray-arrow-down</v-icon> 
                     </v-btn>
                     <!--<a href="http://localhost:3010/download?filepath=assets%2Fupdir%2Fusers%2F2%2Fe08fd1c0-9565-11ec-9881-f14ce0db0432%2F11-500x300.jpg">
                         <v-icon>mdi-tray-arrow-down</v-icon>
@@ -92,7 +98,7 @@
 </template>
 <script lang="ts">
 import Vue from 'vue'
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 
 export default Vue.extend({
     props: {
@@ -113,11 +119,10 @@ export default Vue.extend({
         }
     },
     mounted() {
-        console.log('this.mounted()');
-        console.log(this.cards);
+        //console.log('this.mounted()');
+        //console.log(this.cards);
         try {
-            //this.linkPath = 'http://localhost:3000/sharedlink/' + this.cards[0].FilePath;
-            this.linkPath = 'http://localhost:3000/appData/' + this.cards[0].FilePath;
+            this.linkPath = 'http://localhost:3000/appData/' + (this.cards[0] as any).FilePath;
         } catch (error) {
             console.log(error);
         }
@@ -139,7 +144,7 @@ export default Vue.extend({
         }
     },
     methods: {
-        async updateFavoriteFlag(event, card) {
+        async updateFavoriteFlag(event:any, card:any) {
             card.favorite = event;
             const param = {
                 id: card.id,
