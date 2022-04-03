@@ -109,11 +109,6 @@ export default Vue.extend({
     },
     data() {
         return {
-            cardsTest: [
-                { subtitle: '#1 2021/12/25 13:49', src: 'https://cdn.vuetifyjs.com/images/cards/house.jpg', flex: 6 },
-                { subtitle: '#2 2021/12/25 13:50', src: 'https://cdn.vuetifyjs.com/images/cards/road.jpg', flex: 6 },
-                { subtitle: '#3 2021/12/25 13:51', src: 'https://cdn.vuetifyjs.com/images/cards/plane.jpg', flex: 6 },
-            ],
             dialog: false,
             linkPath: '',
         }
