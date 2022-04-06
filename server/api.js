@@ -82,6 +82,7 @@ const connection = mysql.createConnection({
     user: 'root',
     database: 'albumapp',
     password: '*****', //2021-11-18 PassWordChange
+    multipleStatements: true
 });
 
 //express-session
@@ -564,8 +565,9 @@ app.get('/favoriteSelectData', cors(), (req, res) => {
     }
 });
 
-app.get('/allShareData', cors(), (req, res) => {
+app.get('/allShareData/:offset', cors(), (req, res) => {
     console.log('allShareDataに遷移');
+    const offsetNum = parseInt(req.params.offset);
     const bearToken = req.headers['authorization'];
     if (!bearToken) {
         res.status(500).send('Internal Error.');
@@ -578,20 +580,24 @@ app.get('/allShareData', cors(), (req, res) => {
                 res.status(500).send('Internal Error.');
                 res.end();
             } else {
-                //後で修正
-                const sql = "SELECT * FROM albumapp.imagefile_db WHERE id = 1";
+                //const sql1 = "SELECT COUNT(*) FROM albumapp.imagefile_db WHERE userId = 2 AND PublicFlag = 1";
+                //const sql2 = "SELECT * FROM albumapp.imagefile_db WHERE userId = ? AND PublicFlag = 1 LIMIT 1 OFFSET ?";
+                const sql = "SELECT COUNT(*) AS COUNT FROM albumapp.imagefile_db WHERE userId = ? AND PublicFlag = 1; SELECT * FROM albumapp.imagefile_db WHERE userId = ? AND PublicFlag = 1 LIMIT 1 OFFSET ?"
                 let resMessage;
                 connection.query(
                     sql,
-                    [user.payload.id],
+                    [user.payload.id, user.payload.id, offsetNum],
                     (error, results) => {
-                        if (error) throw error;
+                        if (error) {
+                            res.status(500).send('Internal Error.');
+                            res.end();
+                        }
                         if (results.length > 0) {
                             resMessage = 'ok';
                         } else {
                             resMessage = 'NotFound';
                         }
-                        res.status(200).json({status: resMessage, items: results});
+                        res.status(200).json({status: resMessage, maxCount: results[0], items: results[1]});
                     }
                 );
             }
@@ -651,7 +657,6 @@ app.get('/download', cors(), (req, res) => {
     res.setHeader('Content-disposition', `attachment; filename=${filename}`);
 
     try {
-        let test = encodeURI(filepath);
         let image = fs.readFileSync(filepath);
         console.log('image:')
         let contentType = `image/${filetype}`;
@@ -665,8 +670,7 @@ app.get('/download', cors(), (req, res) => {
         console.log('error:', error.code);
         //res.send(403).send('Not Found');
         //res.end();
-    }
-    
+    } 
 });
 
 app.listen(3010, () => {
