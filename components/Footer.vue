@@ -6,6 +6,7 @@
         >
             {{ this.year }}&copy;OmataR WebApp
         </v-col>
+        <ReturnToTop />
     </v-footer>
 </template>
 <script lang="ts">
