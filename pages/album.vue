@@ -68,10 +68,8 @@
                     >
                         <v-card style="flex: 1">
                             <v-img
-                                :src="imgUrlPath(card.FilePath)" 
-                                alt=""
-                                aspect-ratio="1.7"
-                                contain
+                                :src="imgUrlPath(card.FilePath)"
+                                alt="photo"
                                 height="200px"
                             />
                             <v-card-actions>
@@ -151,7 +149,7 @@ export default Vue.extend({
     methods: {
         imgUrlPath (url: string)  {
             let imagePath = url.replace(/\\/g, "/");
-            return `_nuxt/${imagePath}`;
+            return `appData/${imagePath}`;
         },
         async addFavorite(card:any) {
             card.favorite = !card.favorite;
