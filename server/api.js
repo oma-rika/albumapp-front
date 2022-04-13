@@ -256,6 +256,7 @@ app.get('/albums/:userId/:limit', cors(), (req, res) => {
     );
 });
 
+//お気に入り登録更新
 app.post('/favorite', cors(), (req, res) => {
     console.log('req.body.id', req.body.id);
     if (req.headers) {
@@ -278,6 +279,37 @@ app.post('/favorite', cors(), (req, res) => {
                 connection.query(
                     sql,
                     [like, req.body.id, user.payload.id],
+                    (error, results) => {
+                        if (error) throw error;
+                        res.status(200).send('送信完了');
+                    }
+                );
+            }
+        })
+    }
+});
+
+//アイテムをゴミ箱に移動する
+app.post('/DeleteSelectItem', cors(), (req, res) => {
+    if (req.headers) {
+        console.log('req.headers:', req.headers);
+        const bearToken = req.headers['authorization'];
+        console.log('bearToken:', bearToken);
+        const bearer = bearToken.split(' ');
+        console.log('bearere');
+        const token = bearer[1];
+        jwt.verify(token, 'secret_key', (error, user) => {
+            if (error) {
+                return res.status(403).send('Forbidden');
+            } else {
+                console.log('成功');
+                console.log('user:', user);
+                console.log('user.payload.Id:', user.payload.id);
+                let remove = req.body.delete ? 1 : 0;
+                let sql = 'UPDATE albumapp.imagefile_db SET DeleteFlag=? WHERE id=? AND UserId=?';
+                connection.query(
+                    sql,
+                    [remove, req.body.id, user.payload.id],
                     (error, results) => {
                         if (error) throw error;
                         res.status(200).send('送信完了');
@@ -459,7 +491,7 @@ app.get('/userInfo', cors(), (req, res) => {
         }
     }
 });
-/* multer Test */
+
 app.get('/FilePathData', cors(), (req, res) => {
     const bearToken = req.headers['authorization'];
     if (bearToken) {
@@ -474,7 +506,7 @@ app.get('/FilePathData', cors(), (req, res) => {
                 console.log('成功');
                 console.log('user.payload.Id:', user.payload.id);
                 //後で修正
-                const sql = 'SELECT id, UserId, FilePath, PublicFlag, favorite FROM albumapp.imagefile_db WHERE UserId = ?';
+                const sql = 'SELECT id, FilePath, PublicFlag, favorite, DeleteFlag FROM albumapp.imagefile_db WHERE UserId = ?';
                 connection.query(
                     sql,
                     [user.payload.id],

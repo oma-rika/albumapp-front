@@ -63,7 +63,7 @@
                         cols="4"
                         sm="3"
                         xs="2"
-                        v-if="albums"
+                        v-if="albums && !card.DeleteFlag"
                         class="d-flex"
                     >
                         <v-card style="flex: 1">
@@ -74,8 +74,8 @@
                             />
                             <v-card-actions>
                                     <FavoriteButton
-                                        v-bind:shared="card.favorite"
-                                        v-on:click="updateFavoriteFlag($event, card)"
+                                        :shared="card.favorite"
+                                        @click="updateFavoriteFlag($event, card)"
                                     />
                                     <v-btn 
                                         icon
@@ -87,14 +87,10 @@
                                             mdi-account-plus
                                         </v-icon>
                                     </v-btn>
-                                    <v-btn 
-                                        icon
-                                    >
-                                        <v-icon
-                                        >
-                                            mdi-trash-can
-                                        </v-icon>
-                                    </v-btn>
+                                    <DeleteButton
+                                        :trash="card.DeleteFlag"
+                                        @delete="updateDeleteFlag($event, card)"
+                                    />
                                 </v-btn>
                             </v-card-actions>
                         </v-card>
@@ -147,6 +143,7 @@ export default Vue.extend({
             let imagePath = url.replace(/\\/g, "/");
             return `appData/${imagePath}`;
         },
+        //お気に入りを更新
         async updateFavoriteFlag(event:any, card:any) {
             card.favorite = event;
             const param = {
@@ -155,6 +152,24 @@ export default Vue.extend({
             };
             const authToken = this.$store.getters.getAuthToken;
             await axios.post('http://localhost:3010/favorite/', param, {
+                headers: {
+                    Authorization:  `token ${authToken}`
+                }
+            }).then(response => {
+                this.uploadSuccessful(response);
+            }).catch(error => {
+                this.uploadFailure(error);
+            });
+        },
+        //アイテムの削除
+        async updateDeleteFlag(event:any, card:any) {
+            card.DeleteFlag = event;
+            const param = {
+                id: card.id,
+                delete: event
+            };
+            const authToken = this.$store.getters.getAuthToken;
+            await axios.post('http://localhost:3010/DeleteSelectItem/', param, {
                 headers: {
                     Authorization:  `token ${authToken}`
                 }
