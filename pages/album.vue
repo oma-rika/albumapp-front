@@ -73,14 +73,10 @@
                                 height="200px"
                             />
                             <v-card-actions>
-                                    <v-btn icon>
-                                        <v-icon
-                                            @click="addFavorite(card)"
-                                            :color="card.favorite ? 'red' : ''"
-                                        >
-                                            mdi-heart
-                                        </v-icon>
-                                    </v-btn>
+                                    <FavoriteButton
+                                        v-bind:shared="card.favorite"
+                                        v-on:click="updateFavoriteFlag($event, card)"
+                                    />
                                     <v-btn 
                                         icon
                                     >
@@ -151,14 +147,14 @@ export default Vue.extend({
             let imagePath = url.replace(/\\/g, "/");
             return `appData/${imagePath}`;
         },
-        async addFavorite(card:any) {
-            card.favorite = !card.favorite;
-            let p =  {
+        async updateFavoriteFlag(event:any, card:any) {
+            card.favorite = event;
+            const param = {
                 id: card.id,
-                favorite: card.favorite
+                favorite: event
             };
             const authToken = this.$store.getters.getAuthToken;
-            await axios.post('http://localhost:3010/favorite/', p, {
+            await axios.post('http://localhost:3010/favorite/', param, {
                 headers: {
                     Authorization:  `token ${authToken}`
                 }
