@@ -68,21 +68,15 @@
                     >
                         <v-card style="flex: 1">
                             <v-img
-                                :src="imgUrlPath(card.FilePath)" 
-                                alt=""
-                                aspect-ratio="1.7"
-                                contain
+                                :src="imgUrlPath(card.FilePath)"
+                                alt="photo"
                                 height="200px"
                             />
                             <v-card-actions>
-                                    <v-btn icon>
-                                        <v-icon
-                                            @click="addFavorite(card)"
-                                            :color="card.favorite ? 'red' : ''"
-                                        >
-                                            mdi-heart
-                                        </v-icon>
-                                    </v-btn>
+                                    <FavoriteButton
+                                        v-bind:shared="card.favorite"
+                                        v-on:click="updateFavoriteFlag($event, card)"
+                                    />
                                     <v-btn 
                                         icon
                                     >
@@ -149,29 +143,29 @@ export default Vue.extend({
     methods: {
         imgUrlPath (url: string)  {
             let imagePath = url.replace(/\\/g, "/");
-            return `_nuxt/${imagePath}`;
+            return `appData/${imagePath}`;
         },
-        async addFavorite(card:any) {
-            card.favorite = !card.favorite;
-            let p =  {
+        async updateFavoriteFlag(event:any, card:any) {
+            card.favorite = event;
+            const param = {
                 id: card.id,
-                favorite: card.favorite
+                favorite: event
             };
             const authToken = this.$store.getters.getAuthToken;
-            await axios.post('http://localhost:3010/favorite/', p, {
+            await axios.post('http://localhost:3010/favorite/', param, {
                 headers: {
                     Authorization:  `token ${authToken}`
                 }
             }).then(response => {
-                this.addFavoriteSuccessful(response);
+                this.uploadSuccessful(response);
             }).catch(error => {
-                this.addFavoriteFailure(error);
+                this.uploadFailure(error);
             });
         },
-        addFavoriteSuccessful (response:any) {
+        uploadSuccessful (response:any) {
             console.log('成功した');
         },
-        addFavoriteFailure (error: AxiosError<{error: string}>) {
+        uploadFailure (error: AxiosError<{error: string}>) {
             console.log('失敗した');
         },
     }
