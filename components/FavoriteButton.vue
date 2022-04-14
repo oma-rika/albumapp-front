@@ -2,7 +2,7 @@
     <v-btn icon>
         <v-icon
             :color="shared == 1 ? 'red' : ''"
-            v-on:click="$emit('click', !shared)"
+            @click="$emit('click', !shared)"
         >
             mdi-heart
         </v-icon>
