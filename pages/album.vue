@@ -13,7 +13,10 @@
         />
         <v-main>
             <v-container fluid>
-                <v-row justify="center">
+                <NodataMessage
+                    :noDataFlag="NothingFlag"
+                />
+                <!--<v-row justify="center">
                     <v-col
                         cols="12"
                         align="center"
@@ -52,7 +55,7 @@
                             500 Error.しばらく経ってから再度アクセスしてください。
                         </v-alert>
                     </v-col>
-                </v-row>
+                </v-row>-->
                 <v-row
                     align="center"
                     class="pt-10 pb-10"
@@ -111,7 +114,7 @@ export default Vue.extend({
     asyncData({ $axios, store }) {
         const authToken = store.getters.getAuthToken;
         console.log('authToken:', authToken);
-        return $axios.get('http://localhost:3010/FilePathData', {
+        return $axios.get('http://localhost:3010/MyData', {
             headers: {
                 Authorization: `token ${authToken}`
             }
@@ -119,15 +122,14 @@ export default Vue.extend({
 
             if (response.data.status == 'ok') {
                 return { albums: response.data.items};
-            }
-
-            if (response.data.status == 'NotFount') {
-                this.NothingFlag = true;
-                return;
+            } else if (response.data.status == 'NotFound') {
+                return {
+                    albums: null,
+                    NothingFlag: true
+                };
             }
         }).catch(error => {
-            console.log('取得前にエラーが発生');
-            this.internalFailure = true;
+            return { internalFailure: true };
         });
     },
     data() {
@@ -164,6 +166,7 @@ export default Vue.extend({
         //アイテムの削除
         async updateDeleteFlag(event:any, card:any) {
             card.DeleteFlag = event;
+            //console.log('event:', event);
             const param = {
                 id: card.id,
                 delete: event
@@ -179,6 +182,7 @@ export default Vue.extend({
                 this.uploadFailure(error);
             });
         },
+        //公開するアイテムを選択
         async addPublicItem(card: any) {
             card.PublicFlag = !card.PublicFlag;
             let p = {
