@@ -77,6 +77,7 @@ export default Vue.extend({
                 { title: 'Album', icon: 'mdi-image', href: 'album' },
                 { title: 'Favorite', icon: 'mdi-heart', href: 'favorite' },
                 { title: 'Share', icon: 'mdi-account-multiple-plus', href: 'share' },
+                { title: 'Trash', icon: 'mdi-trash-can', href: 'trashcan'},
                 { title: 'dashboard', icon: 'mdi-view-dashboard-outline', href: 'dashboard' }
             ],
         }

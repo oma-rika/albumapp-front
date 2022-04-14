@@ -292,19 +292,19 @@ app.post('/favorite', cors(), (req, res) => {
 //アイテムをゴミ箱に移動する
 app.post('/DeleteSelectItem', cors(), (req, res) => {
     if (req.headers) {
-        console.log('req.headers:', req.headers);
+        //console.log('req.headers:', req.headers);
         const bearToken = req.headers['authorization'];
-        console.log('bearToken:', bearToken);
+        //console.log('bearToken:', bearToken);
         const bearer = bearToken.split(' ');
-        console.log('bearere');
+        //console.log('bearere');
         const token = bearer[1];
         jwt.verify(token, 'secret_key', (error, user) => {
             if (error) {
                 return res.status(403).send('Forbidden');
             } else {
-                console.log('成功');
-                console.log('user:', user);
-                console.log('user.payload.Id:', user.payload.id);
+                //console.log('成功');
+                //console.log('user:', user);
+                //console.log('user.payload.Id:', user.payload.id);
                 let remove = req.body.delete ? 1 : 0;
                 let sql = 'UPDATE albumapp.imagefile_db SET DeleteFlag=? WHERE id=? AND UserId=?';
                 connection.query(
@@ -313,6 +313,46 @@ app.post('/DeleteSelectItem', cors(), (req, res) => {
                     (error, results) => {
                         if (error) throw error;
                         res.status(200).send('送信完了');
+                    }
+                );
+            }
+        })
+    }
+});
+
+//ゴミ箱に移動したアイテムを復元する
+app.post('/restoreSelectItem', cors(), (req, res) => {
+    if (req.headers) {
+        //console.log('req.headers:', req.headers);
+        const bearToken = req.headers['authorization'];
+        //console.log('bearToken:', bearToken);
+        const bearer = bearToken.split(' ');
+        //console.log('bearere');
+        const token = bearer[1];
+        jwt.verify(token, 'secret_key', (error, user) => {
+            if (error) {
+                return res.status(403).send('Forbidden');
+            } else {
+                console.log('成功');
+                //console.log('user:', user);
+                //console.log('user.payload.Id:', user.payload.id);
+                console.log('req.body.id', req.body.id);
+                let restore = req.body.delete ? 1 : 0;
+                console.log('restore', restore);
+                let sql = 'UPDATE albumapp.imagefile_db SET DeleteFlag=? WHERE id=? AND UserId=?';
+                let resMessage;
+                connection.query(
+                    sql,
+                    [restore, req.body.id, user.payload.id],
+                    (error, results) => {
+                        if (error) throw error;
+                        //res.status(200).send('送信完了');
+                        if (results.length > 0) {
+                            resMessage = 'ok';
+                        } else {
+                            resMessage = 'NotFound';
+                        }
+                        res.status(200).json({status: resMessage, items: results});
                     }
                 );
             }
@@ -492,18 +532,19 @@ app.get('/userInfo', cors(), (req, res) => {
     }
 });
 
-app.get('/FilePathData', cors(), (req, res) => {
+//アルバムを表示
+app.get('/MyData', cors(), (req, res) => {
     const bearToken = req.headers['authorization'];
     if (bearToken) {
-        console.log('bearToken:', bearToken);
+        //console.log('bearToken:', bearToken);
         const bearer = bearToken.split(' ');
-        console.log('bearere:', bearer);
+        //console.log('bearere:', bearer);
         const token = bearer[1];
         jwt.verify(token, 'secret_key', (error, user) => {
             if (error) {
                 return res.status(403).send('Forbidden');
             } else {
-                console.log('成功');
+                //console.log('成功');
                 console.log('user.payload.Id:', user.payload.id);
                 //後で修正
                 const sql = 'SELECT id, FilePath, PublicFlag, favorite, DeleteFlag FROM albumapp.imagefile_db WHERE UserId = ?';
@@ -563,7 +604,7 @@ app.post('/imagefileUpload', cors(), (req, res) => {
         })
     }
 });
-
+//お気に入り一覧
 app.get('/favoriteSelectData', cors(), (req, res) => {
     const bearToken = req.headers['authorization'];
     if (bearToken) {
@@ -579,6 +620,39 @@ app.get('/favoriteSelectData', cors(), (req, res) => {
                 console.log('user.payload.Id:', user.payload.id);
                 //後で修正
                 const sql = 'SELECT * FROM albumapp.imagefile_db WHERE UserId = ? AND favorite = 1';
+                let resMessage;
+                connection.query(
+                    sql,
+                    [user.payload.id],
+                    (error, results) => {
+                        if (results.length > 0) {
+                            resMessage = 'ok';
+                        } else {
+                            resMessage = 'NotFound';
+                        }
+                        res.status(200).json({status: resMessage, items: results});
+                    }
+                );
+            }
+        })
+    }
+});
+//ゴミ箱に移動したアイテムを表示
+app.get('/TrashData', cors(), (req, res) => {
+    const bearToken = req.headers['authorization'];
+    if (bearToken) {
+        //console.log('bearToken:', bearToken);
+        const bearer = bearToken.split(' ');
+        //console.log('bearere:', bearer);
+        const token = bearer[1];
+        jwt.verify(token, 'secret_key', (error, user) => {
+            if (error) {
+                return res.status(403).send('Forbidden');
+            } else {
+                //console.log('成功');
+                //console.log('user.payload.Id:', user.payload.id);
+                //後で修正
+                const sql = 'SELECT * FROM albumapp.imagefile_db WHERE UserId = ? AND DeleteFlag = 1';
                 let resMessage;
                 connection.query(
                     sql,
