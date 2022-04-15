@@ -160,12 +160,12 @@
                                                         :email.sync="params.user.email"
                                                     />
 
-                                                    プライバシー設定
+                                                    <!--プライバシー設定
                                                     <v-checkbox v-model="checkbox">
                                                         <template v-slot:label>
                                                             <div>自分のアルバムを公開する</div>
                                                         </template>
-                                                    </v-checkbox>
+                                                    </v-checkbox>-->
                                                     <nuxt-link to="/">アカウントを削除される場合はこちら</nuxt-link>
                                                 </v-form>
                                             </v-card-text>
