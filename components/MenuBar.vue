@@ -4,7 +4,6 @@
     dark 
     dense
   >
-      <v-app-bar-nav-icon />
       <v-toolbar-title>
         <HeaderTitle />
       </v-toolbar-title>
@@ -43,7 +42,6 @@ import Vue from 'vue'
 export default Vue.extend({
   data() {
     return {
-      posts: []
     }
   },
 })
