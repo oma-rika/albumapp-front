@@ -3,14 +3,18 @@
       <v-avatar
         size="36"
         color="purple"
-        class="mr-2"
+        class="mr-2 header-title"
+        @click="$router.push('/')"
       >
         <v-icon dark>
           mdi-folder-image
         </v-icon>
       </v-avatar>
-      <v-toolbar-title class="hidden-xs-only">
-          Album App
+      <v-toolbar-title 
+        class="hidden-xs-only header-title"
+        @click="$router.push('/')"
+      >
+        Album App
       </v-toolbar-title>
     </v-row>
 </template>
@@ -22,6 +26,11 @@ export default Vue.extend({
     return {
 
     }
-  },
+  }
 })
 </script>
+<style lang="scss">
+.header-title {
+  cursor: pointer;
+}
+</style>

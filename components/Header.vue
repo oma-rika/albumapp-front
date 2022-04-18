@@ -7,20 +7,8 @@
       :clipped-left="clippedLeft"
     >
       <slot name="navigation-toggle-button" />
-      <!--<v-app-bar-nav-icon />-->
-      <div class="text-center">
-        <v-avatar
-          size="36"
-          color="purple"
-          class="mr-2"
-        >
-          <v-icon dark>
-            mdi-folder-image
-          </v-icon>
-        </v-avatar>
-      </div>
-      <v-toolbar-title>
-        Album App
+      <v-toolbar-title class="pl-0">
+        <HeaderTitle />  
       </v-toolbar-title>
 
       <v-spacer />
@@ -117,5 +105,3 @@ export default Vue.extend({
   }
 })
 </script>
-<style>
-</style>
