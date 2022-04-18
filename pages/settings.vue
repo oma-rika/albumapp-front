@@ -280,21 +280,29 @@
                                 <v-card-text>
                                         <v-divider classs="mb-4" />
                                         <v-card class="mt-4">
-                                            <v-data-table
-                                                :headers="headers"
-                                                :items="logs"
-                                                item-key="id"
-                                                hide-default-footer
-                                            >
-                                                <template v-slot:item.filename="{item}">
-                                                <nuxt-link to="/" class="text-decoration-none">
-                                                        {{item.filename}}
-                                                    </nuxt-link>
+                                            <v-simple-table>
+                                                <template v-slot:default>
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="text-left">
+                                                                変更内容
+                                                            </th>
+                                                            <th class="text-left">
+                                                                日時
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    <tr
+                                                        v-for="item in logs"
+                                                        :key="item.name"
+                                                    >
+                                                        <td>{{ item.message }}</td>
+                                                        <td>{{ item.updateTime | datetime }}</td>
+                                                    </tr>
+                                                    </tbody>
                                                 </template>
-                                                <template v-slot:item.datetime="{item}">
-                                                        {{item.datetime}}
-                                                </template>
-                                            </v-data-table>
+                                            </v-simple-table>
                                         </v-card>
                                 </v-card-text>
                             </v-card>
@@ -312,21 +320,24 @@ import axios from 'axios'
 
 export default Vue.extend({
     middleware: 'authenticated',
+    asyncData({$axios, params, store }) {
+        const authToken = store.getters.getAuthToken;
+        //アクティビティ情報取得
+        return $axios.get('http://localhost:3010/messagelog', {
+            headers: {
+                Authorization: `token ${authToken}`
+            }
+        }).then(response => {
+            return { logs: response.data.items }
+        }).catch(error => {
+            console.log('error');
+        });
+    },
     data() {
         return {
             isValid: false,
             checkbox: false,
             avatarFilename: '',
-            headers: [
-                {
-                    text: '更新したファイル名',
-                    value: 'filename'
-                },
-                {
-                    text: '更新日',
-                    value: 'datetime'
-                }
-            ],
             params: {
                 user: {
                     name: '',
@@ -339,13 +350,6 @@ export default Vue.extend({
                     confirm: ''
                 }
             },
-            logs: [
-                {id: 1, filename: "Sample01.jpg", datetime: "2021/12/27 18:30"},
-                {id: 2, filename: "Sample02.png", datetime: "2021/12/27 18:35"},
-                {id: 3, filename: "Sample03.jpg", datetime: "2021/12/27 18:37"},
-                {id: 4, filename: "Sample04.gif", datetime: "2021/12/27 18:38"},
-                {id: 5, filename: "Sample05.jpg", datetime: "2021/12/28 18:39"}, 
-            ],
             dialog: false,
             avatarBinaryFile: '',
             drawer: false,
@@ -353,6 +357,7 @@ export default Vue.extend({
             passwordChageSuccessFlag: false,
             serverErrorFlag: false,
             loading: false,
+            logs: null,
         }
     },
     computed: {
@@ -368,6 +373,22 @@ export default Vue.extend({
             const icon = this.show ? 'mdi-eye' : 'mdi-eye-off'
             const type = this.show ? 'text' : 'password'
             return { icon, type }
+        }
+    },
+    filters: {
+        datetime: function(val:any) {
+            if (!val) return;
+            const date = new Date(val);
+            const yyyy = date.getFullYear();
+            console.log(yyyy);
+            // 0埋めにする
+            const MM = `0${date.getMonth() + 1}`.slice(-2);
+            const dd = `0${date.getDate()}`.slice(-2);
+            const HH = `0${date.getHours()}`.slice(-2);
+            const mm = `0${date.getMinutes()}`.slice(-2);
+            const ss = `0${date.getSeconds()}`.slice(-2);
+            
+            return `${yyyy}年${MM}月${dd}日 ${HH}:${mm}:${ss}`;
         }
     },
     methods: {
