@@ -82,7 +82,7 @@ const connection = mysql.createConnection({
     user: 'root',
     database: 'albumapp',
     password: '*****', //2021-11-18 PassWordChange
-    multipleStatements: true
+    //multipleStatements: true
 });
 
 //express-session
@@ -686,13 +686,12 @@ app.get('/allShareData/:offset', cors(), (req, res) => {
                 res.status(500).send('Internal Error.');
                 res.end();
             } else {
-                //const sql1 = "SELECT COUNT(*) FROM albumapp.imagefile_db WHERE userId = 2 AND PublicFlag = 1";
-                //const sql2 = "SELECT * FROM albumapp.imagefile_db WHERE userId = ? AND PublicFlag = 1 LIMIT 1 OFFSET ?";
-                const sql = "SELECT COUNT(*) AS COUNT FROM albumapp.imagefile_db WHERE userId = ? AND PublicFlag = 1; SELECT * FROM albumapp.imagefile_db WHERE userId = ? AND PublicFlag = 1 LIMIT 1 OFFSET ?"
+                //const sql = "SELECT COUNT(*) AS COUNT FROM albumapp.imagefile_db WHERE userId = ? AND PublicFlag = 1; SELECT * FROM albumapp.imagefile_db WHERE userId = ? AND PublicFlag = 1 LIMIT 1 OFFSET ?"
+                const sql = "SELECT *, (SELECT COUNT(*) FROM albumapp.imagefile_db_public) AS COUNT FROM albumapp.imagefile_db_public";
                 let resMessage;
                 connection.query(
                     sql,
-                    [user.payload.id, user.payload.id, offsetNum],
+                    [offsetNum],
                     (error, results) => {
                         if (error) {
                             res.status(500).send('Internal Error.');
@@ -703,7 +702,7 @@ app.get('/allShareData/:offset', cors(), (req, res) => {
                         } else {
                             resMessage = 'NotFound';
                         }
-                        res.status(200).json({status: resMessage, maxCount: results[0], items: results[1]});
+                        res.status(200).json({status: resMessage, items: results});
                     }
                 );
             }
@@ -779,7 +778,46 @@ app.get('/download', cors(), (req, res) => {
     } 
 });
 
+//アクティビティを取得
+app.get('/messagelog', cors(), (req, res) => {
+    console.log('messagelogに遷移');
+    const bearToken = req.headers['authorization'];
+    if (!bearToken) {
+        res.status(500).send('Internal Error.');
+        res.end();
+    } else {
+        const bearer = bearToken.split(' ');
+        const token = bearer[1];
+        jwt.verify(token, 'secret_key', (error, user) => {
+            if (error) {
+                res.status(500).send('Internal Error.');
+                res.end();
+            }
+            if (user) {
+                const sql = 'SELECT id, message, updateTime FROM albumapp.activity_log WHERE userId=? ORDER BY updateTime DESC';
+                connection.query(
+                    sql,
+                    [user.payload.id],
+                    (error, results) => {
+                        if (error) {
+                            res.status(500).send('Internal Error.');
+                            res.end();
+                        }
+                        if (results.length > 0) {
+                            resMessage = 'ok';
+                        } else {
+                            resMessage = 'NotFound';
+                        }
+                        res.status(200).json({status: resMessage, items: results});
+                    }
+                );
+            }
+        });
+    }
+});
+
+
+
 app.listen(3010, () => {
     console.log('api');
 });
-
