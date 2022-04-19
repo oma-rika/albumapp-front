@@ -19,7 +19,6 @@
                                 <v-card-title>
                                     ログイン
                                 </v-card-title>
-                                [{{ $route.fullPath }}]
                                 <v-card-text class="pb-0">
                                     <v-form
                                         ref="form"
@@ -78,10 +77,9 @@ export default Vue.extend({
             isValid: false,
             loading: false,
             params: {
-                //TODO 削除する
                 user: {
-                    email: 'test@gmail.com',
-                    password: 'possword'
+                    email: '',
+                    password: ''
                 }
             },
             emailAddress: '',
@@ -109,16 +107,11 @@ export default Vue.extend({
                 this.loading = false;
             }, 1500)
         },
+        //ログイン処理
         authSuccessful (response:any) {
-            console.log('ログイン成功');
-            console.log(response);
-            //TODO ログイン処理
             switch(response.data.status) {
                 case 'ok':
-                    console.log('ok');
                     this.auth.push(response.data.items[0]);
-                    //console.log('this.auth:', this.auth);
-                    //console.log('response.data.items:', response.data.items[0]);
                     this.$store.dispatch("updateMessageAction", response.data.items[0]);
                     //this.auth = response.data.items[0];
                     //成功したらリダイレクト
@@ -129,13 +122,11 @@ export default Vue.extend({
                     this.failure = true;
                     break;
             }
-            //TODO 記憶ルートリダイレクト
         },
         authFailure ({response}:{response:any}) {
             if (response && response.status === 404) {
                 console.log('response.status:', response.status);
             }
-            //console.log("エラー発生");
         }
     }
 })
