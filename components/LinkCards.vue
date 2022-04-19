@@ -7,8 +7,9 @@
             v-for="card in cards"
             :key="card.subtitle"
             :cols="card.flex"
+            class="d-flex"
         >
-            <v-card>
+            <v-card style="flex-basis:500px">
                 <v-img :src="`appData/${card.FilePath}`" height="200px" />
                 <v-card-subtitle>{{ card.UpdateTime | datetime }}</v-card-subtitle>
                 <v-card-actions>
