@@ -1,39 +1,6 @@
-// const { Router } = require("express");
 const express = require('express');
 const app = express();
 
-// const { Nuxt, Builder } = require('nuxt')
-
-// async function start() {
-
-//     const isDev = !(process.env.NODE_ENV !== 'production')
-//     const port = process.env.PORT || 3000
-
-//     const app = express();
-
-//     // Nuxt インスタンスを取得
-//     const nuxt = await loadNuxt(config.dev ? 'dev' : 'start')
-
-//     // すべてのルートを Nuxt でレンダリング
-//     app.use(nuxt.render)
-
-//     // ホットリローディングつきの開発モードの場合のみビルド
-//     if (isDev) {
-//         builder(nuxt)
-//     } else {
-//         await next.ready()
-//     }
-//     // サーバーをリッスン
-//     app.listen(port, () => {
-//         console.log(`Listening on port ${port}`)
-//     })
-// }
-
-// start();
-
-
-// const cookieParser = require('cookie-parser');
-// app.use(cookieParser());
 const cors    = require('cors');
 app.use(cors());
 const uuid = require('uuid');
@@ -82,7 +49,6 @@ const connection = mysql.createConnection({
     user: 'root',
     database: 'albumapp',
     password: '*****', //2021-11-18 PassWordChange
-    //multipleStatements: true
 });
 
 //express-session
@@ -100,43 +66,15 @@ app.use(
     })
 );
 
-
-// if (app.get('env') === 'production') {
-//     app.set('trust proxy', 1) // trust first proxy
-//     sess.cookie.secure = true // serve secure cookies
-//   }
-
-// app.use(
-//     cookieSession({
-//         name: "session",
-//         keys: ["key1", "key2"],
-//         maxAge: 60 * 1000 * 30
-//     })
-// )
-
-
-// app.use((req, res, next) => {
-//     if (req.session.userId == undefined) {
-//         console.log('ログインしていません');
-//         //res.redirect('/signin');
-//     } else {
-//         console.log('ログインしています');
-//     }
-//     next();
-// });
-
 connection.connect((err) => {
     if (err) throw err;
     console.log('connected to mysql');
 });
 
 app.get('/api', (req, res) => {
-    //ブラウザから送られてくるTokenのチェック
-    //console.log('req.headers:', req.headers);
     if (req.headers) {
         const bearToken = req.headers['authorization'];
         const bearer = bearToken.split(' ');
-        console.log('bearere');
         const token = bearer[1];
         jwt.verify(token, 'secret_key', (error, user) => {
             if (error) {
@@ -149,46 +87,9 @@ app.get('/api', (req, res) => {
     }
 })
 
-// app.get('/api',   (req, res) => {
-//     //res.status(200).send('app gets!!!');
-//     console.log('app.getに遷移');
-//     //res.set({ 'Access-Control-Allow-Origin': 'http://localhost:56976' });
-//     let ret=[];
-//     connection.connect((err) => {
-//         if (err) throw err;
-//         console.log('connected to mysql');
-//     });
-//     let sql = 'SELECT * FROM albumapp.user'
-//     connection.query(sql, function(error, rows, fields) {
-//         //if (error) res.status(500).send(error);
-//         let date = [];
-//         for (let i = 0; i < rows.length; i++) {
-//             console.log(rows[i]);
-//             date.push({
-//                 id: rows[i].id,
-//                 Account: rows[i].Account,
-//                 NickName: rows[i].NickName
-//             })
-//         }
-//         ret = JSON.stringify(date);
-//         res.setHeader('Content-Type', 'application/json; charset=utf-8');
-//         res.setHeader('Access-Control-Allow-Origin', '*');
-//         res.status(200).send(ret);
-//     })
-//     connection.end();
-// });
-
-//app.set('views', __dirname + '/views');
-//app.set('view engine', 'ejs');
-
-//app.get('/test', (req, res) => {
-//    res.render('signup');
-//});
-
 app.post('/login', cors(), (req, res) => {
-    console.log('signinアクション');
-    console.log(req.body.emailAddress);
-    console.log(req.body.passWord);
+    //console.log(req.body.emailAddress);
+    //console.log(req.body.passWord);
     let resMessage;
     let sql = 'SELECT * FROM albumapp.user WHERE MailAddress = ? AND Password = ?';
     connection.query(
@@ -207,7 +108,6 @@ app.post('/login', cors(), (req, res) => {
                         password: results[0].Password,
                         NickName: results[0].NickName
                     };
-                    //console.log('payload', payload);
                     token = jwt.sign({
                         expiresIn: '1d', // Expires after date
                         payload
@@ -292,19 +192,13 @@ app.post('/favorite', cors(), (req, res) => {
 //アイテムをゴミ箱に移動する
 app.post('/DeleteSelectItem', cors(), (req, res) => {
     if (req.headers) {
-        //console.log('req.headers:', req.headers);
         const bearToken = req.headers['authorization'];
-        //console.log('bearToken:', bearToken);
         const bearer = bearToken.split(' ');
-        //console.log('bearere');
         const token = bearer[1];
         jwt.verify(token, 'secret_key', (error, user) => {
             if (error) {
                 return res.status(403).send('Forbidden');
             } else {
-                //console.log('成功');
-                //console.log('user:', user);
-                //console.log('user.payload.Id:', user.payload.id);
                 let remove = req.body.delete ? 1 : 0;
                 let sql = 'UPDATE albumapp.imagefile_db SET DeleteFlag=? WHERE id=? AND UserId=?';
                 connection.query(
@@ -323,19 +217,14 @@ app.post('/DeleteSelectItem', cors(), (req, res) => {
 //ゴミ箱に移動したアイテムを復元する
 app.post('/restoreSelectItem', cors(), (req, res) => {
     if (req.headers) {
-        //console.log('req.headers:', req.headers);
         const bearToken = req.headers['authorization'];
-        //console.log('bearToken:', bearToken);
         const bearer = bearToken.split(' ');
-        //console.log('bearere');
         const token = bearer[1];
         jwt.verify(token, 'secret_key', (error, user) => {
             if (error) {
                 return res.status(403).send('Forbidden');
             } else {
                 console.log('成功');
-                //console.log('user:', user);
-                //console.log('user.payload.Id:', user.payload.id);
                 console.log('req.body.id', req.body.id);
                 let restore = req.body.delete ? 1 : 0;
                 console.log('restore', restore);
@@ -425,15 +314,6 @@ app.get('/shareAllItem', cors(), (req, res) => {
 });
 
 app.post('/signup', cors(), (req, res) => {
-    console.log('post受け取り');
-    //post値受け取れるか確認
-    console.log(req.body.UserName);
-    console.log(req.body.email);
-    console.log(req.body.password);
-    // connection.connect((err) => {
-    //     if (err) throw err;
-    //     console.log('connected to mysql');
-    // });
     let sql = 'INSERT INTO albumapp.user (Account, MailAddress, Password) VALUES (?, ?, ?)'
     connection.query(
         sql,
@@ -443,16 +323,10 @@ app.post('/signup', cors(), (req, res) => {
             res.status(200).send('新規登録完了！');
         }
     );
-    //connection.end();
 });
 
 app.post('/fileUpload', cors(), (req, res) => {
     console.log('画像送信');
-    //post値受け取れるか確認
-    // console.log('id:', req.body.userId);
-    // console.log('imageId:', req.body.imageId);
-    // console.log('path:', req.body.imagePath);
-
     let sql = 'INSERT INTO albumapp.image_db (Userid, ImageId, Path) VALUES (?, ?, ?)';
     connection.query(
         sql,
@@ -461,13 +335,7 @@ app.post('/fileUpload', cors(), (req, res) => {
             res.status(200).send('登録完了！');
         }
     );
-    //connection.end();
 });
-
-// app.post('/avatarUpload', multer({ dest: 'updir/' }).single('file'), (req, res) => {
-//    console.log('req.file:', req.file.filename);
-//    res.status(200).send('ファイルのアップロードが完了しました。');
-// });
 
 app.post('/avatarUpload/:userId', multer({ storage: storage }).single('file'), (req, res) => {
     const userId = req.params.userId;
@@ -503,9 +371,6 @@ app.get('/userInfo', cors(), (req, res) => {
                 if (error) {
                     return res.status(403).send('Forbidden');
                 } else {
-                    console.log('成功');
-                    console.log('user:', user);
-                    console.log('user.payload.Id:', user.payload.id);
                     let sql = 'SELECT AvatarFilePath, ShowAvatarFlag From albumapp.user WHERE ID=?;';
                     connection.query(
                         sql,
@@ -536,15 +401,12 @@ app.get('/userInfo', cors(), (req, res) => {
 app.get('/MyData', cors(), (req, res) => {
     const bearToken = req.headers['authorization'];
     if (bearToken) {
-        //console.log('bearToken:', bearToken);
         const bearer = bearToken.split(' ');
-        //console.log('bearere:', bearer);
         const token = bearer[1];
         jwt.verify(token, 'secret_key', (error, user) => {
             if (error) {
                 return res.status(403).send('Forbidden');
             } else {
-                //console.log('成功');
                 console.log('user.payload.Id:', user.payload.id);
                 //後で修正
                 const sql = 'SELECT id, FilePath, PublicFlag, favorite, DeleteFlag FROM albumapp.imagefile_db WHERE UserId = ?';
@@ -641,16 +503,12 @@ app.get('/favoriteSelectData', cors(), (req, res) => {
 app.get('/TrashData', cors(), (req, res) => {
     const bearToken = req.headers['authorization'];
     if (bearToken) {
-        //console.log('bearToken:', bearToken);
         const bearer = bearToken.split(' ');
-        //console.log('bearere:', bearer);
         const token = bearer[1];
         jwt.verify(token, 'secret_key', (error, user) => {
             if (error) {
                 return res.status(403).send('Forbidden');
             } else {
-                //console.log('成功');
-                //console.log('user.payload.Id:', user.payload.id);
                 //後で修正
                 const sql = 'SELECT * FROM albumapp.imagefile_db WHERE UserId = ? AND DeleteFlag = 1';
                 let resMessage;
@@ -745,36 +603,21 @@ app.get('/download', cors(), (req, res) => {
     console.log('downloadに遷移');
     let filepath = req.query.filepath;
     let filetype = filepath.split('.').pop();
-    //console.log('filepath:', filepath);
-    //console.log('filetype:', filetype);
-    //let contentType = `image/${filetype}`;
-    //console.log('contentype:', contentType);    
-    //res.setHeader('Content-Type', contentType);
-
-    //let filename = encodeURI(filepath);
     //末尾だけ
     let imgfilename = filepath.split('/').pop();
     let filename = encodeURI(imgfilename);
 
-
-    //console.log('filename:', filename);
-    //res.setHeader('Content-Disposition:', `attachment; filename=${filename}`);
     res.setHeader('Content-disposition', `attachment; filename=${filename}`);
 
     try {
         let image = fs.readFileSync(filepath);
         console.log('image:')
         let contentType = `image/${filetype}`;
-        //console.log('contentype:', contentType);    
         res.writeHead(200, {'Content-Type':`${contentType}`});
-        //res.download(filepath);
-        //console.log('filepath:', filepath);
         res.end(image);
         return;
     } catch (error) {
         console.log('error:', error.code);
-        //res.send(403).send('Not Found');
-        //res.end();
     } 
 });
 
