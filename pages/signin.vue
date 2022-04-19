@@ -112,6 +112,8 @@ export default Vue.extend({
             switch(response.data.status) {
                 case 'ok':
                     this.auth.push(response.data.items[0]);
+
+
                     this.$store.dispatch("updateMessageAction", response.data.items[0]);
                     //this.auth = response.data.items[0];
                     //成功したらリダイレクト
