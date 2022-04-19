@@ -253,7 +253,6 @@
                                                         label="パスワードを入力"
                                                         @click:append="show = !show"
                                                     />
-                                                    password => [{{ params }}]
                                                     <v-btn
                                                         :disabled="!isValid || loading"
                                                         :loading="loading"
@@ -345,7 +344,7 @@ export default Vue.extend({
                     password: ''
                 },
                 password: {
-                    current: 'aaa',
+                    current: '',
                     new: '',
                     confirm: ''
                 }
