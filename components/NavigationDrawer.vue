@@ -8,7 +8,7 @@
         <template v-slot:prepend>
             <v-list-item two-line>
                 <v-list-item-avatar>
-                     <v-img 
+                    <v-img
                         :src="require(`../assets/${userInfo.avatar}`)" alt="アバター画像"
                         contain
                         v-if="userInfo.avatar"
