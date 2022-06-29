@@ -12,6 +12,7 @@ const multer = require('multer');
 const path = require('path');
 const jwt = require('jsonwebtoken');
 const fs = require("fs");
+const bcrypt = require('bcrypt');
 
 let storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -85,50 +86,6 @@ app.get('/api', (req, res) => {
             }
         })
     }
-})
-
-app.post('/login', cors(), (req, res) => {
-    //console.log(req.body.emailAddress);
-    //console.log(req.body.passWord);
-    let resMessage;
-    let sql = 'SELECT * FROM albumapp.user WHERE MailAddress = ? AND Password = ?';
-    connection.query(
-        sql,
-        [req.body.emailAddress, req.body.passWord],
-        (error, results) => {
-            let token;
-            if (results.length > 0) {
-                console.log('該当するユーザーがいました');
-                if (req.body.passWord === results[0].Password) {
-                    req.session.userId = results[0].ID;
-                    const payload = {
-                        id: results[0].ID,
-                        name: results[0].Account,
-                        email: results[0].MailAddress,
-                        password: results[0].Password,
-                        NickName: results[0].NickName
-                    };
-                    token = jwt.sign({
-                        expiresIn: '1d', // Expires after date
-                        payload
-                    }, 'secret_key');
-                    if (token) {
-                        results[0].Token = token;
-                    }
-                } else {
-                    console.log('パスワードが一致しない');
-                }
-                resMessage = 'ok';
-                res.status(200).json({status: resMessage, items: results});
-            } else {
-                console.log('該当するユーザーはいない');
-                resMessage = 'NotFound';
-                //2022-02-16 itemsのレスポンスは必要か検討
-                res.status(404).send({status: resMessage, items: results});
-            }
-            res.end();
-        }
-    );
 });
 
 app.get('/albums/:userId/:limit', cors(), (req, res) => {
@@ -313,14 +270,100 @@ app.get('/shareAllItem', cors(), (req, res) => {
     }
 });
 
-app.post('/signup', cors(), (req, res) => {
-    let sql = 'INSERT INTO albumapp.user (Account, MailAddress, Password) VALUES (?, ?, ?)'
+//新規登録
+app.post('/signup', cors(),
+    (req, res, next) => {
+        //入力値が入っているかのチェック
+        const username = req.body.UserName;
+        const email = req.body.email;
+        const password = req.body.password;
+
+        if (username === '' || email === '' || password === '') {
+            res.status(400).send('値が入力されていません');
+        } else {
+            next();
+        }
+    },
+    (req, res, next) => {
+        //メールアドレスの重複チェック
+        const email = req.body.email;
+        const sql = 'SELECT * FROM albumapp.user WHERE MailAddress = ?';
+        connection.query(
+            sql,
+            [email],
+            (error, results) => {
+                if (results.length > 0) {
+                    res.status(409).send('ユーザー登録に失敗しました');
+                } else {
+                    next();
+                }
+            }
+        );
+    },
+    (req, res) => {
+        const sql = 'INSERT INTO albumapp.user (Account, MailAddress, Password) VALUES (?, ?, ?)';
+        const username = req.body.UserName;
+        const email = req.body.email;
+        const password = req.body.password;
+        bcrypt.hash(password, 10, (error, hash) => {
+            connection.query(
+                sql,
+                [username, email, hash],
+                (error, resuls) => {
+                    if (error) throw error;
+                    res.status(200).send('新規登録完了！');
+                }
+            );
+        });
+    }
+);
+
+//ログイン
+app.post('/login', cors(), (req, res) => {
+    //console.log(req.body.emailAddress);
+    //console.log(req.body.passWord);
+    const email = req.body.emailAddress;
+    let resMessage;
+    let sql = 'SELECT * FROM albumapp.user WHERE MailAddress = ?';
     connection.query(
         sql,
-        [req.body.UserName, req.body.email, req.body.password],
-        (error, resuls) => {
-            if (error) throw error;
-            res.status(200).send('新規登録完了！');
+        [email],
+        (error, results) => {
+            let token;
+            if (results.length > 0) {
+                const password = req.body.passWord;
+                const hash = results[0].password;
+                bcrypt.compare(password, hash, (error, isEqual) => {
+                    if (isEqual) {
+                        req.session.userId = results[0].ID;
+                        const payload = {
+                            id: results[0].ID,
+                            name: results[0].Account,
+                            email: results[0].MailAddress,
+                            password: results[0].Password,
+                            NickName: results[0].NickName
+                        };
+                        token = jwt.sign({
+                            expiresIn: '1d', // Expires after date
+                            payload
+                        }, 'secret_key');
+                        if (token) {
+                            results[0].Token = token;
+                        }
+                    } else {
+                        //後ほど修正する
+                        console.log('パスワードが一致しない');
+                    }
+                });
+                resMessage = 'ok';
+                res.status(200).json({status: resMessage, items: results});
+            } else {
+                console.log('該当するユーザーはいない');
+                resMessage = 'NotFound';
+                //2022-02-16 itemsのレスポンスは必要か検討
+                res.status(404).send({status: resMessage, items: results});
+            }
+            res.end();
         }
     );
 });

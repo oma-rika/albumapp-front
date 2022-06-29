@@ -26,7 +26,7 @@
                 transition="fade-transition"
                 v-if="createErrorMsgFlag"
             >
-                送信に失敗しました。しばらく経ってから再度お試し下さい。
+              ユーザー登録に失敗しました
             </v-alert>
 
             <v-row justify="center">
@@ -74,7 +74,6 @@
                                         新規登録
                                     </v-btn>
                                 </v-form>
-                                <!--{{ params }} -->
                         </v-card-text>
                     </v-card>
                 </v-col>
@@ -143,11 +142,21 @@ export default Vue.extend({
         }, 1500)
     },
     createFailure (error: AxiosError<{error: string}>) {
-      console.log('エラー発生');
       this.createErrorMsgFlag = true;
       setTimeout(() => {
+          const refForm: any = this.$refs.form;
+          refForm.reset();
+          //初期化する
+          this.params = {
+              user: {
+                  name: '',
+                  email: '',
+                  password: ''
+              }
+          };
         this.createErrorMsgFlag = false;
-      }, 2500);
+        this.loading = false;
+      }, 2000);
     }
   }
 })
