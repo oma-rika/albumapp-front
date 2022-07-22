@@ -4,6 +4,18 @@
             <MenuBar />
             <v-main>
                 <v-container fluid>
+                    <!-- 登録失敗メッセージ -->
+                    <v-alert
+                        dense
+                        outlined
+                        type="error"
+                        class="mx-auto"
+                        max-width="600"
+                        transition="fade-transition"
+                        v-if="failure"
+                    >
+                        ログインに失敗しました
+                    </v-alert>
                     <v-row justify="center">
                         <v-col
                             cols="12"
@@ -109,8 +121,10 @@ export default Vue.extend({
         },
         //ログイン処理
         authSuccessful (response:any) {
+            //console.log('response:', response);
             switch(response.data.status) {
                 case 'ok':
+                    //console.log('responseData:', response.data.items);
                     this.auth.push(response.data.items[0]);
                     this.$store.dispatch("updateMessageAction", response.data.items[0]);
                     //this.auth = response.data.items[0];
@@ -118,14 +132,28 @@ export default Vue.extend({
                     this.$router.push('dashboard');
                     break;
                 default:
-                    console.log('notAccount');
+                    //console.log('notAccount');
                     this.failure = true;
                     break;
             }
         },
         authFailure ({response}:{response:any}) {
-            if (response && response.status === 404) {
-                console.log('response.status:', response.status);
+            if (response && response.status === 400) {
+                this.failure = true;
+                //console.log('response.status:', response.status);
+                setTimeout(() => {
+                    const refForm: any = this.$refs.form;
+                    refForm.reset();
+                    //初期化する
+                    this.params = {
+                        user: {
+                            email: '',
+                            password: ''
+                        }
+                    };
+                    this.failure = false;
+                    this.loading = false;
+                }, 1500)
             }
         }
     }
