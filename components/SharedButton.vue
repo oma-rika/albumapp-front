@@ -1,10 +1,10 @@
 <template>
     <v-btn icon>
         <v-icon
-            :color="favorite == 1 ? 'red' : ''"
-            @click="$emit('click', !favorite)"
+            :color="shared == 1 ? 'primary' : ''"
+            @click="$emit('click', !shared)"
         >
-            mdi-heart
+            mdi-account-plus
         </v-icon>
     </v-btn>
 </template>
@@ -12,7 +12,7 @@
 import Vue from 'vue'
 export default Vue.extend({
     props: {
-        favorite: {
+        shared: {
             default: 0
         }
     }
