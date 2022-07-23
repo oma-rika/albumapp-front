@@ -58,7 +58,6 @@
                                     :password.sync="params.password.new"
                                     set-validation
                                 />
-                                [{{params.password}}]
                                 <p class="mb-3">新しいパスワードの確認</p>
                                 <v-text-field
                                     v-model="params.password.confirm"
