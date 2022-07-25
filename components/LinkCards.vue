@@ -14,16 +14,14 @@
                 <v-card-subtitle>{{ card.UpdateTime | datetime }}</v-card-subtitle>
                 <v-card-actions>
                     <v-spacer />
-                    <FavoriteButton
-                        v-bind:shared="card.favorite"
-                        v-on:click="updateFavoriteFlag($event, card)"
-                    />
-                    <!--<v-btn 
+                    <v-btn
                         icon
-                        @click="download(card)"
+                        @click="updateFavoriteFlag(card)"
                     >
-                        <v-icon>mdi-tray-arrow-down</v-icon>
-                    </v-btn>-->
+                        <v-icon>
+                            mdi-heart
+                        </v-icon>
+                    </v-btn>
                     <v-btn
                         icon
                         :href="`http://localhost:3010/download?filepath=${card.FilePath}`"
@@ -140,11 +138,9 @@ export default Vue.extend({
         }
     },
     methods: {
-        async updateFavoriteFlag(event:any, card:any) {
-            card.favorite = event;
+        async updateFavoriteFlag(card:any) {
             const param = {
-                id: card.id,
-                favorite: event
+                fileId: card.ID
             };
             const authToken = this.$store.getters.getAuthToken;
             await axios.post('http://localhost:3010/favorite/', param, {

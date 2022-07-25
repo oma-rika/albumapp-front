@@ -16,21 +16,16 @@
             <!--[{{ albums }}]
             [{{ maxCount }}]
             [{{ offset }}]-->
-            
+            <NodataMessage
+                    :noDataFlag="NothingFlag"
+            />
+            <!--[{{NothingFlag}}]-->
             <div
               v-scroll="handleScroll"
               class="box"
             >
-              <!--<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. A atque amet harum aut ab veritatis earum porro praesentium ut corporis. Quasi provident dolorem officia iure fugiat, eius mollitia sequi quisquam.</p>
-              <div 
-                v-for="i in offset"
-                style="width: 100px; height: 100px; background: #eee; margin-bottom:10px;"
-              >
-                [{{i}}]
-              </div>-->
               <LinkCards :cards=albums />
               <div v-if="loading">
-                <!--<p>Loading....</p>-->
                 <v-progress-circular
                   indeterminate
                  />
@@ -52,13 +47,13 @@ export default Vue.extend({
   middleware: 'authenticated',
   async fetch () {
         const authToken = this.$store.getters.getAuthToken;
-        console.log('TopページのautoToken:', authToken);
+        //console.log('TopページのautoToken:', authToken);
         await axios.get('http://localhost:3010/allShareData/0', {
             headers: {
                 Authorization: `token ${authToken}`
             }
         }).then(response => {
-
+            console.log('response:', response.data);
             if (response.data.status == 'ok') {
                 const list = response.data.items;
                 for (let i = 0; i < list.length; i++) {
@@ -67,13 +62,9 @@ export default Vue.extend({
                 (this as any).albums = [...response.data.items];
                 (this as any).maxCount = parseInt(response.data.maxCount[0].COUNT);
             }
-            
-
-            if (response.data.status == 'NotFount') {
-                console.log('1件もデータない');
-                return { albums: '1件もデータない' };
+            if (response.data.status == 'NotFound') {
+                (this as any).NothingFlag = true;
             }
-
         }).catch(error => {
             console.log('取得前にエラーが発生');
             //this.internalFailure = true;
@@ -88,6 +79,7 @@ export default Vue.extend({
         loading: false,
         maxCount: 0,
         completeFlag: false,
+        NothingFlag: false
     }
   },
   mounted() {

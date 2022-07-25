@@ -16,46 +16,29 @@
                 <NodataMessage
                     :noDataFlag="NothingFlag"
                 />
-                <!--<v-row justify="center">
-                    <v-col
-                        cols="12"
-                        align="center"
-                    >
-                        <v-alert
-                            prominent
-                            type="error"
-                            outlined
-                            class="pt-20"
-                            max-width="600"
-                            v-if="!albums && NothingFlag"
-                        >
-                            <v-row align="center">
-                                <v-col class="grow">
-                                1件もまだ登録されていません。まずは編集画面から登録してください。
-                                </v-col>
-                                <v-col class="shrink">
-                                    <v-btn
-                                        depressed
-                                        color="error"
-                                        to="/dashboard"
-                                    >
-                                        Access dashboard
-                                    </v-btn>
-                                </v-col>
-                            </v-row>
-                        </v-alert>
-                        <v-alert
-                            v-if="internalFailure"
-                            dense
-                            outlined
-                            type="error"
-                            class="mt-12"
-                            max-width="600"
-                        >
-                            500 Error.しばらく経ってから再度アクセスしてください。
-                        </v-alert>
-                    </v-col>
-                </v-row>-->
+            <!-- 更新完了メッセージ -->
+            <v-alert
+              dense
+              type="success"
+              class="mx-auto mt-10"
+              max-width="600"
+              transition="fade-transition"
+              v-if="UploadSuccessFlag"
+            >
+                更新しました
+            </v-alert>
+            <!-- 更新失敗メッセージ -->
+            <v-alert
+                dense
+                outlined
+                type="error"
+                class="mx-auto mt-10"
+                max-width="600"
+                transition="fade-transition"
+                v-if="UploadFailureFlag"
+            >
+                更新失敗しました
+            </v-alert>
                 <v-row
                     align="center"
                     class="pt-10 pb-10"
@@ -76,20 +59,10 @@
                                 height="200px"
                             />
                             <v-card-actions>
-                                    <FavoriteButton
-                                        :shared="card.favorite"
-                                        @click="updateFavoriteFlag($event, card)"
+                                    <SharedButton
+                                        :shared="card.PublicFlag"
+                                        @click="addPublicItem($event, card)"
                                     />
-                                    <v-btn 
-                                        icon
-                                    >
-                                        <v-icon
-                                            @click="addPublicItem(card)"
-                                            :color="card.PublicFlag ? 'primary' : ''"
-                                        >
-                                            mdi-account-plus
-                                        </v-icon>
-                                    </v-btn>
                                     <DeleteButton
                                         :trash="card.DeleteFlag"
                                         @delete="updateDeleteFlag($event, card)"
@@ -137,6 +110,8 @@ export default Vue.extend({
             drawer: false,
             albums: null,
             NothingFlag: false,
+            UploadSuccessFlag: false,
+            UploadFailureFlag: false,
             internalFailure: false,
         }
     },
@@ -145,30 +120,12 @@ export default Vue.extend({
             let imagePath = url.replace(/\\/g, "/");
             return `appData/${imagePath}`;
         },
-        //お気に入りを更新
-        async updateFavoriteFlag(event:any, card:any) {
-            card.favorite = event;
-            const param = {
-                id: card.id,
-                favorite: event
-            };
-            const authToken = this.$store.getters.getAuthToken;
-            await axios.post('http://localhost:3010/favorite/', param, {
-                headers: {
-                    Authorization:  `token ${authToken}`
-                }
-            }).then(response => {
-                this.uploadSuccessful(response);
-            }).catch(error => {
-                this.uploadFailure(error);
-            });
-        },
         //アイテムの削除
         async updateDeleteFlag(event:any, card:any) {
             card.DeleteFlag = event;
             //console.log('event:', event);
             const param = {
-                id: card.id,
+                id: card.ID,
                 delete: event
             };
             const authToken = this.$store.getters.getAuthToken;
@@ -177,16 +134,16 @@ export default Vue.extend({
                     Authorization:  `token ${authToken}`
                 }
             }).then(response => {
-                this.uploadSuccessful(response);
+                this.uploadSuccessful();
             }).catch(error => {
                 this.uploadFailure(error);
             });
         },
         //公開するアイテムを選択
-        async addPublicItem(card: any) {
-            card.PublicFlag = !card.PublicFlag;
+        async addPublicItem(event:any, card: any) {
+            card.PublicFlag = event;
             let p = {
-                id: card.id,
+                id: card.ID,
                 public: card.PublicFlag
             };
             console.log('p:', p);
@@ -196,16 +153,25 @@ export default Vue.extend({
                     Authorization:  `token ${authToken}`
                 }
             }).then(response => {
-                this.uploadSuccessful(response);
+                this.uploadSuccessful();
             }).catch(error => {
                 this.uploadFailure(error);
             });
         },
-        uploadSuccessful (response:any) {
-            console.log('成功した');
+        uploadSuccessful () {
+            //console.log('成功した');
+            this.UploadSuccessFlag = true;
+            setTimeout(() => {
+                this.UploadSuccessFlag = false;
+            }, 1500);
         },
         uploadFailure (error: AxiosError<{error: string}>) {
-            console.log('失敗した');
+            //console.log('失敗した');
+            this.UploadFailureFlag = true;
+            setTimeout(() => {
+                this.UploadFailureFlag = false;
+            }, 1500);
+
         },
     }
 })
