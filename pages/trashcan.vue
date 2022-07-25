@@ -13,9 +13,25 @@
         />
         <v-main>
             <v-container fluid>
-                <!--<NodataMessage
-                    :noDataFlag="NothingFlag"
-                />-->
+                <v-col
+                    cols="12"
+                    align="center"
+                >
+                    <v-alert
+                        prominent
+                        type="error"
+                        outlined
+                        class="pt-20"
+                        max-width="600"
+                        v-if="NothingFlag"
+                    >
+                        <v-row align="center">
+                            <v-col class="grow">
+                            削除されたアイテムはありません
+                            </v-col>
+                        </v-row>
+                    </v-alert>
+                </v-col>
                 <v-row
                     align="center"
                     class="pt-10 pb-10"
@@ -86,7 +102,6 @@ export default Vue.extend({
                 Authorization: `token ${authToken}`
             }
         }).then(response => {
-
             if (response.data.status == 'ok') {
                 return { items: response.data.items};
             } else if (response.data.status == 'NotFound') {
@@ -116,7 +131,7 @@ export default Vue.extend({
         //復元を選択
         async restoreItem(card:any) {
             const param = {
-                id: card.id,
+                id: card.ID,
                 delete: false
             };
             //console.log('param', param);

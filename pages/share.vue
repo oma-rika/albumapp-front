@@ -28,7 +28,7 @@
                         >
                             <v-row align="center">
                                 <v-col class="grow">
-                                公開中のアイテムは1件もありません。
+                                公開中のアイテムは1件もありません
                                 </v-col>
                             </v-row>
                         </v-alert>
