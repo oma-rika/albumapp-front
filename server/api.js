@@ -236,16 +236,18 @@ app.post('/restoreSelectItem', cors(), (req, res) => {
             } else {
                 console.log('成功');
                 console.log('req.body.id', req.body.id);
-                let restore = req.body.delete ? 1 : 0;
+                const restore = req.body.delete ? 1 : 0;
+                const fileId = req.body.id;
+                const userId = user.payload.id;
                 console.log('restore', restore);
                 let sql = 'UPDATE albumapp.imagefiles SET DeleteFlag=? WHERE ID=? AND UserId=?';
                 let resMessage;
                 connection.query(
                     sql,
-                    [restore, req.body.id, user.payload.id],
+                    [restore, fileId, userId],
                     (error, results) => {
                         if (error) throw error;
-                        //res.status(200).send('送信完了');
+
                         if (results.length > 0) {
                             resMessage = 'ok';
                         } else {
@@ -625,13 +627,13 @@ app.get('/TrashData', cors(), (req, res) => {
             if (error) {
                 return res.status(403).send('Forbidden');
             } else {
-                //後で修正
                 const sql = 'SELECT * FROM albumapp.imagefiles WHERE UserId = ? AND DeleteFlag = 1';
                 let resMessage;
                 connection.query(
                     sql,
                     [user.payload.id],
                     (error, results) => {
+                        if (error) throw error;
                         if (results.length > 0) {
                             resMessage = 'ok';
                         } else {
@@ -660,7 +662,10 @@ app.get('/allShareData/:offset', cors(), (req, res) => {
                 res.status(500).send('Internal Error.');
                 res.end();
             } else {
-                const sql = 'SELECT *, (SELECT COUNT(*) FROM albumapp.imagefiles_public_view) AS COUNT FROM albumapp.imagefiles_public_view';
+                //const sql = 'SELECT *, (SELECT COUNT(*) FROM albumapp.imagefiles_public_view) AS COUNT FROM albumapp.imagefiles_public_view';
+                const sql = 'SELECT imagefiles.ID, imagefiles.UserId, imagefiles.FilePath, imagefiles.PublicFlag, imagefiles.UpdateTime, posts_like.UserId AS PostLikeUser, COUNT(posts_like.UserId) AS likes \
+                            FROM albumapp.imagefiles LEFT OUTER JOIN albumapp.posts_like ON albumapp.imagefiles.ID = albumapp.posts_like.FileId \
+                            GROUP BY imagefiles.UserId';
                 let resMessage;
                 connection.query(
                     sql,
