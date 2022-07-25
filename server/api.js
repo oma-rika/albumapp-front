@@ -591,13 +591,16 @@ app.get('/favoriteSelectData', cors(), (req, res) => {
                 return res.status(403).send('Forbidden');
             } else {
                 console.log('成功');
-                console.log('user.payload.Id:', user.payload.id);
-                //後で修正
-                const sql = 'SELECT * FROM albumapp.imagefiles WHERE UserId = ? AND favorite = 1';
+                const userId = user.payload.id;
+                //const sql = 'SELECT * FROM albumapp.imagefiles WHERE UserId = ? AND favorite = 1';
+                const sql = 'SELECT imagefiles.ID, posts_like.UserId, imagefiles.FilePath, imagefiles.UpdateTime \
+                FROM albumapp.imagefiles \
+                INNER JOIN albumapp.posts_like ON albumapp.imagefiles.UserId = albumapp.posts_like.UserId \
+                WHERE posts_like.UserId = ?';
                 let resMessage;
                 connection.query(
                     sql,
-                    [user.payload.id],
+                    [userId],
                     (error, results) => {
                         if (results.length > 0) {
                             resMessage = 'ok';
@@ -611,6 +614,7 @@ app.get('/favoriteSelectData', cors(), (req, res) => {
         })
     }
 });
+
 //ゴミ箱に移動したアイテムを表示
 app.get('/TrashData', cors(), (req, res) => {
     const bearToken = req.headers['authorization'];
@@ -656,7 +660,7 @@ app.get('/allShareData/:offset', cors(), (req, res) => {
                 res.status(500).send('Internal Error.');
                 res.end();
             } else {
-                const sql = 'SELECT *, (SELECT COUNT(*) FROM albumapp.imagefiles_public_view) AS COUNT FROM albumapp.imagefiles_public_view'
+                const sql = 'SELECT *, (SELECT COUNT(*) FROM albumapp.imagefiles_public_view) AS COUNT FROM albumapp.imagefiles_public_view';
                 let resMessage;
                 connection.query(
                     sql,
