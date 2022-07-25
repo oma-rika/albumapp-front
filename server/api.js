@@ -13,6 +13,7 @@ const path = require('path');
 const jwt = require('jsonwebtoken');
 const fs = require("fs");
 const bcrypt = require('bcrypt');
+const { rejects } = require('assert');
 
 let storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -51,6 +52,16 @@ const connection = mysql.createConnection({
     database: 'albumapp',
     password: '*****', //2021-11-18 PassWordChange
 });
+
+const pool = mysql.createPool({
+    connectionLimit : 2,
+    host: 'localhost',
+    port: 3306,
+    user: 'root',
+    database: 'albumapp',
+    password: '*****',
+    timezone: 'jst'
+})
 
 //express-session
 app.use(
@@ -114,37 +125,79 @@ app.get('/albums/:userId/:limit', cors(), (req, res) => {
 });
 
 //お気に入り登録更新
-app.post('/favorite', cors(), (req, res) => {
-    console.log('req.body.id', req.body.id);
-    if (req.headers) {
-        console.log('req.headers:', req.headers);
-        const bearToken = req.headers['authorization'];
-        console.log('bearToken:', bearToken);
-        const bearer = bearToken.split(' ');
-        console.log('bearere');
-        const token = bearer[1];
-        jwt.verify(token, 'secret_key', (error, user) => {
-            if (error) {
-                return res.status(403).send('Forbidden');
-            } else {
-                console.log('成功');
-                console.log('user:', user);
-                console.log('user.payload.Id:', user.payload.id);
-                let like = req.body.favorite ? 1 : 0;
-                console.log('like', like);
-                let sql = 'UPDATE albumapp.imagefile_db SET favorite=? WHERE id=? AND UserId=?';
-                connection.query(
-                    sql,
-                    [like, req.body.id, user.payload.id],
-                    (error, results) => {
-                        if (error) throw error;
-                        res.status(200).send('送信完了');
-                    }
-                );
-            }
-        })
+app.post('/favorite', cors(),
+    (req, res, next) => {
+        console.log('Favoriteへ遷移');
+        //値が送られてきたかのチェック
+        console.log('req.body.fileId', req.body.fileId);
+        //console.log('req.body.userId', req.body.userId);
+        req.session.fileId = req.body.fileId;
+        //const userId = req.body.userId;
+        if (req.session.fileId === '') {
+            res.status(400).send('値がありません');
+        } else {
+            next();
+        }
+    },
+    (req, res) => {
+        //ヘッダー情報チェック
+        if (req.headers) {
+            //console.log('req.headers:', req.headers);
+            const bearToken = req.headers['authorization'];
+            //console.log('bearToken:', bearToken);
+            const bearer = bearToken.split(' ');
+            //console.log('bearere');
+            const token = bearer[1];
+            //console.log('token:', token);
+            jwt.verify(token, 'secret_key', (error, user) => {
+                if (error) {
+                    return res.status(403).send('Forbidden');
+                } else {
+                    //console.log('user:', user);
+                    //console.log('user.payload.id:', user.payload.id);
+                    req.session.userId = user.payload.id;
+                    pool.getConnection((pool_error, connection) => {
+                        if(pool_error) throw pool_error;
+                        let sql = 'SELECT EXISTS(SELECT * FROM albumapp.posts_like WHERE FileId = ? AND UserId = ?) AS Favorite';
+                        connection.query(
+                            sql,
+                            [req.session.fileId, req.session.userId],
+                            (error, results) => {
+                                if (error) throw error;
+                                if (results[0].Favorite === 0) {
+                                    //console.log('INSERT');
+                                    const insert_query = 'INSERT INTO albumapp.posts_like (FileID, UserId) VALUES (?, ?)';
+                                    connection.query(
+                                        insert_query,
+                                        [req.session.fileId, req.session.userId],
+                                        (err, rows) => {
+                                            if(err) throw err;
+                                            console.log('rows:', rows);
+                                            connection.release();
+                                        }
+                                    );
+                                } else {
+                                    //console.log('DELETE');
+                                    const delete_query = 'DELETE FROM albumapp.posts_like WHERE FileID = ? AND UserId = ?';
+                                    connection.query(
+                                        delete_query,
+                                        [req.session.fileId, req.session.userId],
+                                        (err, rows) => {
+                                            if(err) throw err;
+                                            console.log('rows:', rows);
+                                            connection.release();
+                                        }
+                                    );
+                                }
+                            }
+                        );
+                    });
+                    res.status(200).send('送信完了');
+                }
+            })
+        }
     }
-});
+);
 
 //アイテムをゴミ箱に移動する
 app.post('/DeleteSelectItem', cors(), (req, res) => {
@@ -157,7 +210,7 @@ app.post('/DeleteSelectItem', cors(), (req, res) => {
                 return res.status(403).send('Forbidden');
             } else {
                 let remove = req.body.delete ? 1 : 0;
-                let sql = 'UPDATE albumapp.imagefile_db SET DeleteFlag=? WHERE id=? AND UserId=?';
+                let sql = 'UPDATE albumapp.imagefiles SET DeleteFlag=? WHERE ID=? AND UserId=?';
                 connection.query(
                     sql,
                     [remove, req.body.id, user.payload.id],
@@ -185,7 +238,7 @@ app.post('/restoreSelectItem', cors(), (req, res) => {
                 console.log('req.body.id', req.body.id);
                 let restore = req.body.delete ? 1 : 0;
                 console.log('restore', restore);
-                let sql = 'UPDATE albumapp.imagefile_db SET DeleteFlag=? WHERE id=? AND UserId=?';
+                let sql = 'UPDATE albumapp.imagefiles SET DeleteFlag=? WHERE ID=? AND UserId=?';
                 let resMessage;
                 connection.query(
                     sql,
@@ -220,7 +273,7 @@ app.post('/shareItem', cors(), (req, res) => {
                 return res.status(403).send('Forbidden');
             }
             let publicItem = req.body.public ? 1 : 0;
-            let sql = 'UPDATE albumapp.imagefile_db SET PublicFlag=? WHERE id=? AND UserId=?';
+            let sql = 'UPDATE albumapp.imagefiles SET PublicFlag=? WHERE ID=? AND UserId=?';
             connection.query(
                 sql,
                 [publicItem, req.body.id, user.payload.id],
@@ -249,14 +302,11 @@ app.get('/shareAllItem', cors(), (req, res) => {
             } else {
                 console.log('成功');
                 console.log('user.payload.Id:', user.payload.id);
-                let sql = 'SELECT * FROM albumapp.imagefile_db WHERE PublicFlag=1';
+                let sql = 'SELECT * FROM albumapp.imagefiles WHERE PublicFlag=1';
                 connection.query(
                     sql,
                     (error, results) => {
                         if (error) throw error;
-                        if (results.length > 0) {
-
-                        }
                         if (results.length > 0) {
                             resMessage = 'ok';
                         } else {
@@ -287,7 +337,7 @@ app.post('/signup', cors(),
     (req, res, next) => {
         //メールアドレスの重複チェック
         const email = req.body.email;
-        const sql = 'SELECT * FROM albumapp.user WHERE MailAddress = ?';
+        const sql = 'SELECT * FROM albumapp.users WHERE MailAddress = ?';
         connection.query(
             sql,
             [email],
@@ -301,7 +351,7 @@ app.post('/signup', cors(),
         );
     },
     (req, res) => {
-        const sql = 'INSERT INTO albumapp.user (Account, MailAddress, Password) VALUES (?, ?, ?)';
+        const sql = 'INSERT INTO albumapp.users (Account, MailAddress, Password) VALUES (?, ?, ?)';
         const username = req.body.UserName;
         const email = req.body.email;
         const password = req.body.password;
@@ -319,51 +369,73 @@ app.post('/signup', cors(),
 );
 
 //ログイン
-app.post('/login', cors(), (req, res) => {
+app.post('/login', cors(),
+    (req, res, next) => {
+        //入力値が入っているかのチェック
+        const email = req.body.emailAddress;
+        const password = req.body.password;
+
+        if (email === '' || password === '') {
+            res.status(400).send('値が入力されていません');
+        } else {
+            next();
+        }
+    },
+    (req, res) => {
     //console.log(req.body.emailAddress);
     //console.log(req.body.passWord);
     const email = req.body.emailAddress;
     let resMessage;
-    let sql = 'SELECT * FROM albumapp.user WHERE MailAddress = ?';
+    let sql = 'SELECT * FROM albumapp.users WHERE MailAddress = ?';
     connection.query(
         sql,
         [email],
         (error, results) => {
-            let token;
             if (results.length > 0) {
                 const password = req.body.passWord;
-                const hash = results[0].password;
-                bcrypt.compare(password, hash, (error, isEqual) => {
-                    if (isEqual) {
-                        req.session.userId = results[0].ID;
-                        const payload = {
-                            id: results[0].ID,
-                            name: results[0].Account,
-                            email: results[0].MailAddress,
-                            password: results[0].Password,
-                            NickName: results[0].NickName
-                        };
-                        token = jwt.sign({
-                            expiresIn: '1d', // Expires after date
-                            payload
-                        }, 'secret_key');
-                        if (token) {
-                            results[0].Token = token;
+                const hash = results[0].Password;
+                let token;
+                new Promise((resolve, reject) => {
+                    bcrypt.compare(password, hash, (error, isEqual) => {
+                        if (isEqual) {
+                            req.session.userId = results[0].ID;
+                            const payload = {
+                                id: results[0].ID,
+                                name: results[0].Account,
+                                email: results[0].MailAddress,
+                                password: results[0].Password,
+                                NickName: results[0].NickName
+                            };
+                            token = jwt.sign({
+                                expiresIn: '1d', // Expires after date
+                                payload
+                            }, 'secret_key');
+                            if (token) {
+                                results[0].Token = token;
+                            }
+                            resolve(results);
+                            console.log('Token:', token);
+                        } else {
+                            reject();
                         }
-                    } else {
-                        //後ほど修正する
-                        console.log('パスワードが一致しない');
-                    }
+                    });
+                }).then((value) => {
+                    resMessage = 'ok';
+                    res.status(200).json({status: resMessage, items: value});
+                    res.end();
+                    return;
+                }).catch(() => {
+                    console.log('パスワードが一致しない');
+                    res.status(400).send('入力値エラー');
+                    res.end();
+                    return;
                 });
-                resMessage = 'ok';
-                res.status(200).json({status: resMessage, items: results});
             } else {
                 console.log('該当するユーザーはいない');
-                resMessage = 'NotFound';
-                //2022-02-16 itemsのレスポンスは必要か検討
-                res.status(404).send({status: resMessage, items: results});
+                res.status(400).send('入力値エラー');
+                res.end();
+                return;
             }
-            res.end();
         }
     );
 });
@@ -390,7 +462,7 @@ app.post('/avatarUpload/:userId', multer({ storage: storage }).single('file'), (
     let filepath = reqFilepath.substr(reqFilepath.indexOf('updir'));
     console.log('filepath:', filepath);
 
-    let sql = 'UPDATE albumapp.user SET AvatarFilePath=? WHERE ID = ?';
+    let sql = 'UPDATE albumapp.users SET AvatarFilePath=? WHERE ID = ?';
     connection.query(
         sql,
         [filepath, userId],
@@ -414,15 +486,12 @@ app.get('/userInfo', cors(), (req, res) => {
                 if (error) {
                     return res.status(403).send('Forbidden');
                 } else {
-                    let sql = 'SELECT AvatarFilePath, ShowAvatarFlag From albumapp.user WHERE ID=?;';
+                    let sql = 'SELECT AvatarFilePath, ShowAvatarFlag From albumapp.users WHERE ID=?;';
                     connection.query(
                         sql,
                         [user.payload.id],
                         (error, results) => {
                             if (error) throw error;
-                            if (results.length > 0) {
-
-                            }
                             if (results.length > 0) {
                                 resMessage = 'ok';
                             } else {
@@ -452,7 +521,7 @@ app.get('/MyData', cors(), (req, res) => {
             } else {
                 console.log('user.payload.Id:', user.payload.id);
                 //後で修正
-                const sql = 'SELECT id, FilePath, PublicFlag, favorite, DeleteFlag FROM albumapp.imagefile_db WHERE UserId = ?';
+                const sql = 'SELECT ID, FilePath, PublicFlag, Favorite, DeleteFlag FROM albumapp.imagefiles WHERE UserId = ?';
                 connection.query(
                     sql,
                     [user.payload.id],
@@ -492,7 +561,7 @@ app.post('/imagefileUpload', cors(), (req, res) => {
                     if (req.file) {
                         const reqFilepath = req.file.path;
                         const filePath = reqFilepath.substr(reqFilepath.indexOf('assets'));
-                        let sql = 'INSERT INTO albumapp.imagefile_db (UserId, FilePath) VALUES (?, ?)';
+                        let sql = 'INSERT INTO albumapp.imagefiles (UserId, FilePath) VALUES (?, ?)';
                         connection.query(
                             sql,
                             [req.session.userId, filePath],
@@ -524,7 +593,7 @@ app.get('/favoriteSelectData', cors(), (req, res) => {
                 console.log('成功');
                 console.log('user.payload.Id:', user.payload.id);
                 //後で修正
-                const sql = 'SELECT * FROM albumapp.imagefile_db WHERE UserId = ? AND favorite = 1';
+                const sql = 'SELECT * FROM albumapp.imagefiles WHERE UserId = ? AND favorite = 1';
                 let resMessage;
                 connection.query(
                     sql,
@@ -553,7 +622,7 @@ app.get('/TrashData', cors(), (req, res) => {
                 return res.status(403).send('Forbidden');
             } else {
                 //後で修正
-                const sql = 'SELECT * FROM albumapp.imagefile_db WHERE UserId = ? AND DeleteFlag = 1';
+                const sql = 'SELECT * FROM albumapp.imagefiles WHERE UserId = ? AND DeleteFlag = 1';
                 let resMessage;
                 connection.query(
                     sql,
@@ -587,8 +656,7 @@ app.get('/allShareData/:offset', cors(), (req, res) => {
                 res.status(500).send('Internal Error.');
                 res.end();
             } else {
-                //const sql = "SELECT COUNT(*) AS COUNT FROM albumapp.imagefile_db WHERE userId = ? AND PublicFlag = 1; SELECT * FROM albumapp.imagefile_db WHERE userId = ? AND PublicFlag = 1 LIMIT 1 OFFSET ?"
-                const sql = "SELECT *, (SELECT COUNT(*) FROM albumapp.imagefile_db_public) AS COUNT FROM albumapp.imagefile_db_public";
+                const sql = 'SELECT *, (SELECT COUNT(*) FROM albumapp.imagefiles_public_view) AS COUNT FROM albumapp.imagefiles_public_view'
                 let resMessage;
                 connection.query(
                     sql,
@@ -610,7 +678,7 @@ app.get('/allShareData/:offset', cors(), (req, res) => {
         });
     }
 });
-
+//パスワードの変更
 app.post('/passwordChange', cors(), (req, res) => {
     const bearToken = req.headers['authorization'];
     if (!bearToken) {
@@ -624,18 +692,53 @@ app.post('/passwordChange', cors(), (req, res) => {
                 return res.status(403).send('Forbidden');
             }
             if (user) {
-                if (user.payload.password !== req.body.currentPassword) {
-                    return res.status(403).send('Forbidden');
-                }
-                const sql = 'UPDATE albumapp.user SET Password=? WHERE id=? AND Password=?';
-                connection.query(
-                    sql,
-                    [req.body.newPassword, user.payload.id, req.body.currentPassword],
-                    (error, results) => {
-                        if (error) throw error;
-                        res.status(200).send('送信完了');
-                    }
-                );
+                new Promise((resolve, reject) => {
+                    const currentPassword = req.body.currentPassword;
+                    //console.log('currentPassword:', currentPassword);
+                    req.session.currentPassword = user.payload.password;
+                    //console.log('req.session.currentPassword:', req.session.currentPassword);
+                    bcrypt.compare(currentPassword, req.session.currentPassword, (error, isEqual) => {
+                        if (isEqual) {
+                            resolve();
+                        } else {
+                            reject();
+                        }
+                    });
+                }).then(() => {
+                    const newPassword = req.body.newPassword;
+                    return new Promise((resolve, reject) => {
+                        bcrypt.hash(newPassword, 10, (error, hash) => {
+                            if (error) {
+                                reject();
+                            }
+                            resolve(hash);
+                        });
+                    });
+                }).then((value) => {
+                    const userId = user.payload.id;
+                    const newPassword = value;
+                    //console.log('req.session.currentPassword:', req.session.currentPassword);
+                    //console.log('userId:', userId);
+                    //console.log('newPassword:', newPassword);
+                    const sql = 'UPDATE albumapp.users SET Password=? WHERE id=? AND Password=?';
+                    connection.query(
+                        sql,
+                        [newPassword, userId, req.session.currentPassword],
+                        (error, results) => {
+                            if (error) {
+                                throw error;
+                            }
+                            res.status(200).send('送信完了');
+                            res.end();
+                            return;
+                        }
+                    );
+                }).catch(() => {
+                    console.log('3番目の処理を実行');
+                    res.status(403).send('Forbidden');
+                    res.end();
+                    return 
+                }); 
             }
         });
     }
