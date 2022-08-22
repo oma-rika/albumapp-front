@@ -157,7 +157,7 @@ export default Vue.extend({
     //console.log('params:', params);
     const userId = params.id;
 
-    return $axios.get(`http://localhost:3010/albums/${userId}/1`)
+    return $axios.get(`/albums/${userId}/1`)
     .then(response => {
       return { albums: response.data };
     }).catch(error => {
@@ -165,7 +165,7 @@ export default Vue.extend({
       error({ statusCode: 404, message: 'ページが見つかりません'})
     });
     //練習用に残しておく
-    /*return $axios.get(`http://localhost:3010/albums/${userId}/1`, {
+    /*return $axios.get(`/albums/${userId}/1`, {
       headers: {
         Authorization: `token ${authToken}`
       }
@@ -207,7 +207,7 @@ export default Vue.extend({
             favorite: card.favorite
         };
         const authToken = this.$store.getters.getAuthToken;
-        await axios.post('http://localhost:3010/favorite/', p, {
+        await this.$axios.post('/favorite/', p, {
           headers: {
               Authorization:  `token ${authToken}`
           }

@@ -115,7 +115,7 @@ export default Vue.extend({
     middleware: 'authenticated',
     asyncData({ $axios, store }) {
         const authToken = store.getters.getAuthToken;
-        return $axios.get('http://localhost:3010/favoriteSelectData', {
+        return $axios.get('/favoriteSelectData', {
             headers: {
                 Authorization: `token ${authToken}`
             }
@@ -171,7 +171,7 @@ export default Vue.extend({
             };
             console.log('param:', param);
             const authToken = this.$store.getters.getAuthToken;
-            await axios.post('http://localhost:3010/favorite/', param, {
+            await this.$axios.post('/favorite/', param, {
                 headers: {
                     Authorization:  `token ${authToken}`
                 }

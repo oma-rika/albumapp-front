@@ -106,7 +106,7 @@ export default Vue.extend({
         async login() {
             this.loading = true;
             if (this.isValid) {
-                await axios.post('http://localhost:3010/login', {
+                await this.$axios.post('/login', {
                     emailAddress: this.params.user.email,
                     passWord: this.params.user.password,
                 }).then((response) => {

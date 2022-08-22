@@ -177,7 +177,7 @@ export default Vue.extend({
     methods: {
         async Test() {
             const authToken = this.$store.getters.getAuthToken;
-            await axios.get('http://localhost:3010/api', {
+            await this.$axios.get('/api', {
                 headers: {
                     Authorization:  `token ${authToken}`
                 }

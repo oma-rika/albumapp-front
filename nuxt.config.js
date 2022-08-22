@@ -9,7 +9,8 @@ export default {
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       { hid: 'description', name: 'description', content: '' },
-      { name: 'format-detection', content: 'telephone=no' }
+      { name: 'format-detection', content: 'telephone=no' },
+      { hid: 'robots', name: 'robots', content: 'noindex,nofollow' }
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
@@ -50,9 +51,12 @@ export default {
   serverMiddleware: [
     {path: '/api/', handler: '~/server/api.js'}
   ],
+  
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
-  axios: {},
+  axios: {
+    baseURL: 'http://localhost:3010'
+  },
 
   // PWA module configuration: https://go.nuxtjs.dev/pwa
   pwa: {
@@ -105,7 +109,9 @@ export default {
     //middleware: 'authenticated'
     // 複数ファイル指定の場合は配列で
     // middleware: ['authenticated', 'stats']
-  }
+  },
+
+
 
 }
 

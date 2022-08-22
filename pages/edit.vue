@@ -153,7 +153,7 @@ export default Vue.extend({
             const userId = this.$store.getters.getCurrentUserId;
             console.log('UserId:', userId);
             if (this.binaryFile.length > 0) {
-                axios.post('http://localhost:3010/fileUpload', {
+                this.$axios.post('/fileUpload', {
                     //テストで暫定で1を選択
                     userId: userId,
                     imageId: guid,

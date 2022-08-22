@@ -159,7 +159,7 @@ export default Vue.extend({
                 fileId: card.ID
             };
             const authToken = this.$store.getters.getAuthToken;
-            await axios.post('http://localhost:3010/favorite/', param, {
+            await this.$axios.post('/favorite/', param, {
                 headers: {
                     Authorization:  `token ${authToken}`
                 }
@@ -188,8 +188,8 @@ export default Vue.extend({
         async download(card:any) {
             let filename = card.FilePath.split('/').pop();
             console.log('filename:', filename);
-            await axios.get(
-                'http://localhost:3010/download', {
+            await this.$axios.get(
+                '/download', {
                     params: {
                         filepath: card.FilePath
                     },

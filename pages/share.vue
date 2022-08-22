@@ -110,7 +110,7 @@ export default Vue.extend({
     asyncData({ $axios, store }) {
         console.log('asyncDataに遷移');
         const authToken = store.getters.getAuthToken;
-        return $axios.get('http://localhost:3010/allShareData', {
+        return $axios.get('/allShareData', {
             headers: {
                 Authorization: `token ${authToken}`
             }
@@ -148,7 +148,7 @@ export default Vue.extend({
                 favorite: card.favorite
             };
             const authToken = this.$store.getters.getAuthToken;
-            await axios.post('http://localhost:3010/favorite/', p, {
+            await this.$axios.post('/favorite/', p, {
                 headers: {
                     Authorization:  `token ${authToken}`
                 }
@@ -166,7 +166,7 @@ export default Vue.extend({
             };
             console.log('p:', p);
             const authToken = this.$store.getters.getAuthToken;
-            await axios.post('http://localhost:3010/shareItem/', p, {
+            await this.$axios.post('/shareItem/', p, {
                 headers: {
                     Authorization:  `token ${authToken}`
                 }

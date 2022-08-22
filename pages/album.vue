@@ -87,7 +87,7 @@ export default Vue.extend({
     asyncData({ $axios, store }) {
         const authToken = store.getters.getAuthToken;
         console.log('authToken:', authToken);
-        return $axios.get('http://localhost:3010/MyData', {
+        return $axios.get('/MyData', {
             headers: {
                 Authorization: `token ${authToken}`
             }
@@ -129,7 +129,7 @@ export default Vue.extend({
                 delete: event
             };
             const authToken = this.$store.getters.getAuthToken;
-            await axios.post('http://localhost:3010/DeleteSelectItem/', param, {
+            await this.$axios.post('/DeleteSelectItem/', param, {
                 headers: {
                     Authorization:  `token ${authToken}`
                 }
@@ -148,7 +148,7 @@ export default Vue.extend({
             };
             console.log('p:', p);
             const authToken = this.$store.getters.getAuthToken;
-            await axios.post('http://localhost:3010/shareItem/', p, {
+            await this.$axios.post('/shareItem/', p, {
                 headers: {
                     Authorization:  `token ${authToken}`
                 }

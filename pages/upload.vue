@@ -184,7 +184,7 @@ export default Vue.extend({
                 const authToken = this.$store.getters.getAuthToken;
                 const formData = new FormData();
                 formData.append('file', this.filename);
-                axios.post('http://localhost:3010/imagefileUpload', formData, {
+                this.$axios.post('/imagefileUpload', formData, {
                     headers: {
                         Authorization:  `token ${authToken}`
                     }

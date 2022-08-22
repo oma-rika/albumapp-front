@@ -194,7 +194,7 @@ export default Vue.extend({
     asyncData({$axios, params, store }) {
         const authToken = store.getters.getAuthToken;
         //アクティビティ情報取得
-        return $axios.get('http://localhost:3010/messagelog', {
+        return $axios.get('/messagelog', {
             headers: {
                 Authorization: `token ${authToken}`
             }
@@ -257,7 +257,7 @@ export default Vue.extend({
             this.resetForm();
         },
         adminAvatar(e:any): void {
-            console.log('フォームを送信');
+            //console.log('フォームを送信');
             const userId = this.$store.getters.getCurrentUserId;
             console.log('userId:', userId);
             if (this.avatarFilename) {
@@ -265,7 +265,7 @@ export default Vue.extend({
                 console.log('this->e:', e);
                 const formData = new FormData();
                 formData.append('file', this.avatarFilename);
-                axios.post(`http://localhost:3010/avatarUpload/${userId}`, formData)
+                this.$axios.post(`http://localhost:3010/avatarUpload/${userId}`, formData)
                 .then(response => {
                     this.adminAvatarSuccess();
                     console.log({response});
@@ -290,7 +290,7 @@ export default Vue.extend({
         adminAvatarSuccess() {
             this.avatarChageSuccessFlag = true;
             setTimeout(() => {
-                this.avatarChageSuccessFlag = false;   
+                this.avatarChageSuccessFlag = false;
             }, 1500);
         }
     }

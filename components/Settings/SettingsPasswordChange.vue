@@ -134,7 +134,7 @@ export default Vue.extend({
                     currentPassword: this.params.password.current,
                     newPassword: this.params.password.new
                 };
-                axios.post('http://localhost:3010/passwordChange', p, {
+                this.$axios.post('/passwordChange', p, {
                     headers: {
                        Authorization:  `token ${authToken}` 
                     }

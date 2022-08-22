@@ -67,7 +67,7 @@ export default Vue.extend({
   async fetch () {
         this.userInfo = this.$store.getters.getCurrentUserInfo;
         const authToken = this.$store.getters.getAuthToken;
-        await axios.get('http://localhost:3010/userInfo', {
+        await this.$axios.get('/userInfo', {
             headers: {
                 Authorization:  `token ${authToken}`
             }

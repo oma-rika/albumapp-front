@@ -111,7 +111,7 @@ export default Vue.extend({
       console.log('name', this.params.user.name);
       console.log('email', this.params.user.email);
       console.log('password', this.params.user.password);
-      axios.post('http://localhost:3010/signup', {
+      this.$axios.post('/signup', {
         UserName: this.params.user.name,
         email: this.params.user.email,
         password: this.params.user.password,

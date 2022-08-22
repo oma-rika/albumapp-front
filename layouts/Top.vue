@@ -48,7 +48,7 @@ export default Vue.extend({
   async fetch () {
         const authToken = this.$store.getters.getAuthToken;
         //console.log('TopページのautoToken:', authToken);
-        await axios.get('http://localhost:3010/allShareData/0', {
+        await this.$axios.get('/allShareData/0', {
             headers: {
                 Authorization: `token ${authToken}`
             }
@@ -124,7 +124,7 @@ export default Vue.extend({
         this.loading = false;
         const authToken = this.$store.getters.getAuthToken;
 
-        axios.get(`http://localhost:3010/allShareData/${this.offset}`, {
+        this.$axios.get(`/allShareData/${this.offset}`, {
             headers: {
                 Authorization: `token ${authToken}`
             }
